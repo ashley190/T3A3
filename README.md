@@ -1,7 +1,9 @@
 # Introduction
-**Objective**: The objective of this project is to implement a data access and application layer for the additional features outline on R7 and R8 of T3A2. Below is the proposed database schema to be implemented.
+**Objective**: The objective of this project is to implement a data access and application layer for the additional features outlined in R7 and R8 of T3A2. Below is the proposed database schema to be implemented.
 
 ![db-schema](docs/erd.png)
+
+
 
 # CI/CD
 Continuous integration
@@ -16,6 +18,8 @@ The steps involved in the Continuous Integration(CI) workflow upon pushing onto 
 # File structure
 
 # Installation
+
+# Endpoints:
 
 # Report 1:
 

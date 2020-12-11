@@ -1,0 +1,35 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "T3A3"
+tags:
+- name: "subscriber"
+  description: "User/subscriber related functions"
+- name: "profile"
+  description: "Profile functions"
+- name: "groups"
+  description: "Group functions"
+- name: "content"
+  description: "Content related functions"
+paths:
+  /register:
+    post:
+      tags:
+      - "subscriber"
+      summary: "User/subscriber registration"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Creates new subscriber in database"
+          schema:
+            type: "object"
+            properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "email already exists"
