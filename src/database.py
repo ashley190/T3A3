@@ -1,16 +1,9 @@
-import psycopg2
+from flask_sqlalchemy import SQLAlchemy
 import os
 
 
-connection = psycopg2.connect(
-    database="netflix",
-    user="flask",
-    password=os.getenv("DB_PW"),
-    host="54.196.130.96",
-    port="5432"
-)
-
-cursor = connection.cursor()
-
-cursor.execute("create table if not exists profiles (profile_id serial PRIMARY KEY, name varchar, restrictions varchar);")  # noqa: E501
-connection.commit()
+def init_db(app):
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db = SQLAlchemy(app)
+    return db
