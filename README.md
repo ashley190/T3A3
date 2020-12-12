@@ -16,6 +16,12 @@ The steps involved in the Continuous Integration(CI) workflow upon pushing onto 
 # File structure
 
 # Installation
+Install Python3.8, python3.8-venv and python3-pip installed on system
+Git clone and navigate to folder
+Activate virtual environment
+Install requirements
+Set up .env
+
 
 # Endpoints:
 Endpoints are constructed according to the RESTful convention and its raw format can be viewed [here](docs/endpoints.yaml). This can also be displayed using the [swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/endpoints.yaml).
