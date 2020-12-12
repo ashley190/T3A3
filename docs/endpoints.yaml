@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: "1.0.0"
-  title: "T3A3"
+  title: "T3A3 - Netflix groups"
 tags:
 - name: "subscriber"
   description: "User/subscriber related functions"
@@ -12,7 +12,7 @@ tags:
 - name: "content"
   description: "Content related functions"
 paths:
-  /register:
+  /user/register:
     post:
       tags:
       - "subscriber"
@@ -33,3 +33,502 @@ paths:
           description: "successful operation"
         "401":
           description: "email already exists"
+  /user/login:
+    get:
+      tags: 
+      - "subscriber"
+      summary: "Logs user into system"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Logs in user"
+        schema:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+            password:
+              type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "incorrect login credentials"
+  /user/{user_id}:
+    get:
+      tags: 
+      - "subscriber"
+      summary: "Get user by user id"
+      parameters:
+      - name: "user_id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid user"
+        "404":
+          description: "User not found"
+    patch:
+      tags:
+      - "subscriber"
+      summary: "Update user details"
+      description: "Can only be done by the logged in user"
+      parameters:
+      - name: user_id
+        in: "path"
+        description: "User_id of user to be updated"
+        required: true
+        type: "integer"
+      - name: "subscription"
+        in: "body"
+        description: "fields to be updated"
+        schema:
+          type: "object"
+          properties:
+            subscription:
+              type: "boolean"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "invalid user"
+        "404":
+          description: "user not found"
+    delete:
+      tags:
+      - "subscriber"
+      summary: "Delete user"
+      description: "Can only be done by a logged in user"
+      parameters:
+      - name: user_id
+        in: "path"
+        description: "User_id of user to be deleted"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "invalid user"
+        "404":
+          description: "user not found"
+  /profile/create:
+    post:
+      tags:
+      - "profile"
+      summary: "Create new profile under user_id"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Creates new profile under user_id"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              restrictions:
+                type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid user"
+        "404":
+          description: "User not found"
+  /profile:
+    get:
+      tags:
+      - "profile"
+      summary: "Get profiles"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid user"
+        "404":
+          description: "user not found"
+  /profile/{profile_id}:
+    patch:
+      tags:
+      - "profile"
+      summary: "Update profile details"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        description: "profile fields to be updated"
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            restrictions:
+              type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "invalid profile"
+        "404":
+          description: "profile not found"
+    delete:
+      tags:
+      - "profile"
+      summary: "Delete user"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        description: "profile_id of profile to be deleted"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "invalid profile"
+        "404":
+          description: "profile not found"
+  /profile/{profile_id}/unrecommend:
+    get:
+      tags:
+      - "profile"
+      summary: "Display unrecommended content"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        description: "profile_id of profile to be deleted"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+    put:
+      tags:
+      - "profile"
+      summary: "Add content to unrecommend list"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        description: "profile_id of profile to be deleted"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "adds content_id to list"
+        schema:
+          type: "object"
+          properties:
+            content_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+    delete:
+      tags:
+      - "profile"
+      summary: "Remove content from unrecommend list"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        description: "profile_id of profile to be deleted"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "content_id to be removed"
+        schema:
+          type: "object"
+          properties:
+            content_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "unauthorized"
+        "404":
+          description: "not found"
+  /groups/create:
+    post:
+      tags:
+      - "groups"
+      summary: "Create new group"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Creates new group"
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            description:
+              type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid input"
+  /groups:
+    get:
+      tags:
+      - "groups"
+      summary: "Display groups"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+  /group/{group_id}:
+    get:
+      tags:
+      - "groups"
+      summary: "Display group by id"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+    patch:
+      tags:
+      - "groups"
+      summary: "Update group details"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        description: "fields to be updated"
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            description:
+              type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "groups"
+      summary: "Delete group"
+      description: "Can only be performed by group creator"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        description: "group_id of group to be deleted"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "invalid group"
+        "404":
+          description: "group not found"
+  /group/{group_id}/search:
+    get:
+      tags:
+      - "groups"
+      summary: "Search and display group by id"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+  /group/{group_id}/join:
+    post:
+      tags:
+      - "groups"
+      summary: "Adds user to group"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Adds new profile_id to group"
+        schema:
+          type: "object"
+          properties:
+            profile_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+  /group/{group_id}/unjoin:
+    delete:
+      tags:
+      - "groups"
+      summary: "Unjoin group"
+      description: "Can be peformed by associated profile"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        description: "group_id of group to be deleted"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "profile_id to be removed"
+        schema:
+          type: "object"
+          properties:
+            profile_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "unauthorized"
+        "404":
+          description: "not found"
+  /group/{group_id}/remove_member:
+    delete:
+      tags:
+      - "groups"
+      summary: "Remove member"
+      description: "Can only be peformed by group admin"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        description: "group_id of member to be deleted"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "profile_id to be removed"
+        schema:
+          type: "object"
+          properties:
+            profile_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "unauthorized"
+        "404":
+          description: "not found"
+  /group/{group_id}/content:
+    post:
+      tags:
+      - "groups"
+      summary: "Adds content to group"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "adds content_id to group"
+        schema:
+          type: "object"
+          properties:
+            content_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+    delete:
+      tags:
+      - "groups"
+      summary: "Remove content"
+      parameters:
+      - name: "group_id"
+        in: "path"
+        description: "group_id of content to be deleted"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "content_id to be removed"
+        schema:
+          type: "object"
+          properties:
+            content_id:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+  /content:
+    get:
+      tags:
+        - "content"
+      summary: "Display all content"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "not found"
+    put:
+      tags:
+        - "content"
+      summary: "Create content"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create new content"
+        schema:
+          type: "object"
+          properties:
+            title:
+              type: "string"
+            genre:
+              type: "string"
+            year:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid input"
+  /content/{content_id}:
+    delete:
+      tags:
+      - "content"
+      summary: "remove content"
+      parameters:
+      - name: "content_id"
+        in: "path"
+        description: "id of content to be removed"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "content not found"
