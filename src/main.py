@@ -1,6 +1,7 @@
 # flake8: noqa
 from flask import Flask
 app = Flask(__name__)
+app.config.from_object("default_settings.app_config")
 from dotenv import load_dotenv  
 load_dotenv()
 
