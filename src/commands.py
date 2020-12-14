@@ -30,7 +30,7 @@ def seed_db():
     for i in range(1, 6):
         user = User()
         user.email = f"test{i}@test.com"
-        user.password = bcrypt.generate_password_hash("123456")
+        user.password = bcrypt.generate_password_hash("123456").decode("utf-8")
         user.subscription_status = random.choice([0, 1])
         db.session.add(user)
         users.append(user)

@@ -1,7 +1,7 @@
 from models.User import User
 from schemas.UserSchema import user_schema
 from main import db, bcrypt
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, abort
 
@@ -45,3 +45,30 @@ def users_login():
         identity=str(user.user_id), expires_delta=expiry)
 
     return jsonify({"token": access_token})
+
+
+@users.route("/<int:id>", methods=["GET"])
+@jwt_required
+def get_user(id):
+    user = User.query.get(id)
+    return jsonify(user_schema.dump(user))
+
+
+@users.route("/<int:id>", methods=["PATCH"])
+@jwt_required
+def update_user(id):
+    user = User.query.filter_by(user_id=id)
+    update_fields = user_schema.load(request.json, partial=True)
+    user.update(update_fields)
+    db.session.commit()
+
+    return jsonify(user_schema.dump(user[0]))
+
+
+@users.route("/<int:id>", methods=["DELETE"])
+@jwt_required
+def delete_user(id):
+    user = User.query.get(id)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify(user_schema.dump(user))
