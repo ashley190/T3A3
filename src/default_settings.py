@@ -9,6 +9,7 @@ def get_from_env(var):
 
     return value
 
+
 class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -17,6 +18,7 @@ class Config(object):
     @property
     def SQLALCHEMY_DATABASE_URI(self):
         return get_from_env("DB_URI")
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

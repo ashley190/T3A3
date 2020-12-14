@@ -1,9 +1,9 @@
 from models.Profile import Profile
-from models.User import User
+# from models.User import User
 from main import db
 from schemas.ProfileSchema import profile_schema, profiles_schema
 from flask_jwt_extended import jwt_required
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify
 profiles = Blueprint('profiles', __name__, url_prefix="/profiles")
 
 

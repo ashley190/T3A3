@@ -19,9 +19,24 @@ def drop_db():
 @db_commands.cli.command("seed")
 def seed_db():
     from models.Profile import Profile
+    from models.User import User
+    from main import bcrypt
     import random
     from faker import Faker
+
     faker = Faker()
+    users = []
+
+    for i in range(1, 6):
+        user = User()
+        user.email = f"test{i}@test.com"
+        user.password = bcrypt.generate_password_hash("123456")
+        user.subscription_status = random.choice([0, 1])
+        db.session.add(user)
+        users.append(user)
+
+    db.session.commit()
+    print("User table seeded")
 
     for i in range(20):
         restrictions = ("G", "PG", "M", "MA15+", "R18+")
@@ -31,4 +46,4 @@ def seed_db():
         db.session.add(profile)
 
     db.session.commit()
-    print("Tables seeded!")
+    print("Profile table seeded!")

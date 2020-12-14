@@ -18,6 +18,20 @@ class TestProfiles(unittest.TestCase):
             raise ValueError(result.stdout)
         print("tables seeded")
 
+        cls.headers = {}
+        for i in range(1, 6):
+            cls.login = cls.client.post(
+                "users/login",
+                json={
+                    "email": f"test{i}@test.com",
+                    "password": "123456"
+                }
+            )
+
+            cls.token = cls.login.get_json()["token"]
+            cls.header = {"Authorization": f"Bearer {cls.token}"}
+            cls.headers[f"test{i}"] = cls.header
+
     @classmethod
     def tearDown(cls):
         db.session.remove()
@@ -26,10 +40,8 @@ class TestProfiles(unittest.TestCase):
         cls.app_context.pop()
 
     def test_show_profiles(self):
-        app = create_app()
-        client = app.test_client()
-        response = client.get("/profiles/")
-
+        response = self.client.get(
+            "/profiles/", headers=self.headers["test1"])
         data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
