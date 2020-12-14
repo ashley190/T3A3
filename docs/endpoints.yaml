@@ -12,7 +12,7 @@ tags:
 - name: "content"
   description: "Content related functions"
 paths:
-  /user/register:
+  /users/register:
     post:
       tags:
       - "users"
@@ -33,7 +33,7 @@ paths:
           description: "successful operation"
         "401":
           description: "email already exists"
-  /user/login:
+  /users/login:
     get:
       tags: 
       - "users"
@@ -54,7 +54,7 @@ paths:
           description: "successful operation"
         "400":
           description: "incorrect login credentials"
-  /user/{user_id}:
+  /users/:
     get:
       tags: 
       - "users"
