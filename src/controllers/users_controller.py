@@ -47,9 +47,9 @@ def users_login():
     return jsonify({"token": access_token})
 
 
-@users.route("/<int:id>", methods=["GET"])
+@users.route("/", methods=["GET"])
 @jwt_required
-def get_user(id):
+def get_user():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
@@ -59,9 +59,9 @@ def get_user(id):
     return jsonify(user_schema.dump(user))
 
 
-@users.route("/<int:id>", methods=["PATCH"])
+@users.route("/", methods=["PATCH"])
 @jwt_required
-def update_user(id):
+def update_user():
     user_id = get_jwt_identity()
     user = User.query.filter_by(user_id=user_id)
 
@@ -78,9 +78,9 @@ def update_user(id):
         return abort(404, description="User not found")
 
 
-@users.route("/<int:id>", methods=["DELETE"])
+@users.route("/", methods=["DELETE"])
 @jwt_required
-def delete_user(id):
+def delete_user():
     user_id = get_jwt_identity()
     user = User.query.filter_by(user_id=user_id).first()
 
