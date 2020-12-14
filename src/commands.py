@@ -43,6 +43,7 @@ def seed_db():
         profile = Profile()
         profile.name = faker.first_name_nonbinary()
         profile.restrictions = random.choice(restrictions)
+        profile.user_id = random.choice(users).user_id
         db.session.add(profile)
 
     db.session.commit()

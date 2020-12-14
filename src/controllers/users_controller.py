@@ -1,7 +1,7 @@
 from models.User import User
 from schemas.UserSchema import user_schema
 from main import db, bcrypt
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, abort
 
@@ -50,25 +50,44 @@ def users_login():
 @users.route("/<int:id>", methods=["GET"])
 @jwt_required
 def get_user(id):
-    user = User.query.get(id)
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return abort(404, description="User not found")
+
     return jsonify(user_schema.dump(user))
 
 
 @users.route("/<int:id>", methods=["PATCH"])
 @jwt_required
 def update_user(id):
-    user = User.query.filter_by(user_id=id)
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(user_id=user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
+
     update_fields = user_schema.load(request.json, partial=True)
     user.update(update_fields)
     db.session.commit()
 
-    return jsonify(user_schema.dump(user[0]))
+    try:
+        return jsonify(user_schema.dump(user[0]))
+    except IndexError:
+        return abort(404, description="User not found")
 
 
 @users.route("/<int:id>", methods=["DELETE"])
 @jwt_required
 def delete_user(id):
-    user = User.query.get(id)
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return abort(401, description="Invalid user")
+
     db.session.delete(user)
     db.session.commit()
+
     return jsonify(user_schema.dump(user))

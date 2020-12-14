@@ -36,3 +36,4 @@ Error handling upon incorrect input
 Password hash not returned during schema serialisation
 Use token authentication (expiry 1 day)
 Token generation process using JWT where secret key is stored and retrieved from environment variables during production(diff from development key)
+User authorisation implemented to perform CRUD actions on user owned profiles only

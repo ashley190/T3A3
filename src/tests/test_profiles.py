@@ -46,4 +46,3 @@ class TestProfiles(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(data, list)
-        self.assertTrue(len(data) == 20)
