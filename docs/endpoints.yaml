@@ -268,11 +268,17 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid input"
-  /groups:
+  /groups/:
     get:
       tags:
       - "groups"
       summary: "Display groups"
+      parameters:
+      - name: "profile_id"
+        in: "query"
+        description: "Profile_id to be considered for filter"
+        required: true
+        type: "integer"
       responses:
         "200":
           description: "successful operation"

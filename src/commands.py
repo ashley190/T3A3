@@ -41,7 +41,7 @@ def seed_db():
     db.session.commit()
     print("User table seeded")
 
-    for i in range(20):
+    for i in range(10):
         restrictions = ("G", "PG", "M", "MA15+", "R18+")
         profile = Profile()
         profile.name = faker.first_name_nonbinary()
@@ -52,12 +52,12 @@ def seed_db():
     db.session.commit()
     print("Profile table seeded!")
 
-    for i in range(20):
+    for i in range(30):
         group = Group()
         group.name = faker.word()
         group.description = faker.text()
         GroupMembers(
-            groups=group, profile_id=random.randrange(1, 20),
+            groups=group, profile_id=random.randrange(1, 11),
             admin=random.choice([0, 1]))
         db.session.add(group)
 

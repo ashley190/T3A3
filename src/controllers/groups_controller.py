@@ -4,15 +4,13 @@ from models.Profile import Profile
 from models.User import User
 from main import db
 from schemas.GroupSchema import group_schema
-# from schemas.ProfileSchema import profile_schema
+from schemas.GroupMemberSchema import group_members_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Blueprint, request, jsonify, abort
 groups = Blueprint("groups", __name__, url_prefix="/groups")
 
 
-@groups.route("/create", methods=["POST"])
-@jwt_required
-def create_group():
+def retrieve_profile():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
@@ -27,6 +25,14 @@ def create_group():
     if not profile:
         return abort(404, description="Profile not found")
 
+    return profile
+
+
+@groups.route("/create", methods=["POST"])
+@jwt_required
+def create_group():
+    profile = retrieve_profile()
+
     group_fields = group_schema.load(request.json)
     new_group = Group()
     new_group.name = group_fields["name"]
@@ -37,3 +43,13 @@ def create_group():
     db.session.commit()
 
     return jsonify(group_schema.dump(new_group))
+
+
+@groups.route("/", methods=["GET"])
+@jwt_required
+def get_groups():
+    profile = retrieve_profile()
+
+    groups = GroupMembers.query.filter_by(profile_id=profile.profile_id).all()
+
+    return jsonify(group_members_schema.dump(groups))
