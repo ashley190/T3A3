@@ -1,13 +1,12 @@
 from main import db
+from models.Group import Group
 
-group_members = db.Table(
-    "group_members",
-    db.Column(
-        "profile_id",
-        db.Integer,
-        db.ForeignKey("profiles.profile_id"), primary_key=True),
-    db.Column(
-        "group_id",
-        db.Integer,
-        db.ForeignKey("groups.group_id"), primary_key=True)
-)
+
+class GroupMembers(db.Model):
+    __tablename__ = "group_members"
+    profile_id = db.Column(
+        db.Integer, db.ForeignKey('profiles.profile_id'), primary_key=True)
+    group_id = db.Column(
+        db.Integer, db.ForeignKey('groups.group_id'), primary_key=True)
+    admin = db.Column(db.Boolean)
+    groups = db.relationship(Group, back_populates="profiles")

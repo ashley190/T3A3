@@ -21,6 +21,8 @@ def drop_db():
 def seed_db():
     from models.Profile import Profile
     from models.User import User
+    from models.Group import Group
+    from models.Group_members import GroupMembers
     from main import bcrypt
     import random
     from faker import Faker
@@ -49,3 +51,15 @@ def seed_db():
 
     db.session.commit()
     print("Profile table seeded!")
+
+    for i in range(20):
+        group = Group()
+        group.name = faker.word()
+        group.description = faker.text()
+        GroupMembers(
+            groups=group, profile_id=random.randrange(1, 20),
+            admin=random.choice([0, 1]))
+        db.session.add(group)
+
+    db.session.commit()
+    print("Group table seeded!")

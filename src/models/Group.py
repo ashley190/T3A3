@@ -7,7 +7,7 @@ class Group(db.Model):
     group_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())
-    admin = db.Column(db.Boolean)
+    profiles = db.relationship("GroupMembers", back_populates="groups")
 
     def __repr__(self):
         return f"<Group {self.group_id}>"
