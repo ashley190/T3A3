@@ -39,6 +39,23 @@ def create_profile():
     return jsonify(profile_schema.dump(new_profile))
 
 
+@profiles.route("/<int:id>", methods=["GET"])
+@jwt_required
+def get_profile_by_id(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
+
+    profile = Profile.query.filter_by(profile_id=id, user_id=user.user_id)
+
+    if profile.count() != 1:
+        return abort(404, description="Profile not found")
+
+    return jsonify(profile_schema.dump(profile[0]))
+
+
 @profiles.route("/<int:id>", methods=["PATCH"])
 @jwt_required
 def update_profile(id):
