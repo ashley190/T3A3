@@ -29,3 +29,10 @@ Endpoints are constructed according to the RESTful convention and its raw format
 # Report 1:
 
 # Report 2:
+
+Passwords hashed
+Input validation at schema and model level
+Error handling upon incorrect input
+Password hash not returned during schema serialisation
+Use token authentication (expiry 1 day)
+Token generation process using JWT where secret key is stored and retrieved from environment variables during production(diff from development key)

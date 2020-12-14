@@ -3,8 +3,8 @@ info:
   version: "1.0.0"
   title: "T3A3 - Netflix groups"
 tags:
-- name: "subscriber"
-  description: "User/subscriber related functions"
+- name: "users"
+  description: "User related functions"
 - name: "profile"
   description: "Profile functions"
 - name: "groups"
@@ -15,12 +15,12 @@ paths:
   /user/register:
     post:
       tags:
-      - "subscriber"
-      summary: "User/subscriber registration"
+      - "users"
+      summary: "User registration"
       parameters:
         - in: "body"
           name: "body"
-          description: "Creates new subscriber in database"
+          description: "Creates new user in database"
           schema:
             type: "object"
             properties:
@@ -36,7 +36,7 @@ paths:
   /user/login:
     get:
       tags: 
-      - "subscriber"
+      - "users"
       summary: "Logs user into system"
       parameters:
       - name: "body"
@@ -57,7 +57,7 @@ paths:
   /user/{user_id}:
     get:
       tags: 
-      - "subscriber"
+      - "users"
       summary: "Get user by user id"
       parameters:
       - name: "user_id"
@@ -73,7 +73,7 @@ paths:
           description: "User not found"
     patch:
       tags:
-      - "subscriber"
+      - "users"
       summary: "Update user details"
       description: "Can only be done by the logged in user"
       parameters:
@@ -99,7 +99,7 @@ paths:
           description: "user not found"
     delete:
       tags:
-      - "subscriber"
+      - "users"
       summary: "Delete user"
       description: "Can only be done by a logged in user"
       parameters:

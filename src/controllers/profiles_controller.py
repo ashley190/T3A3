@@ -1,11 +1,14 @@
 from models.Profile import Profile
+from models.User import User
 from main import db
 from schemas.ProfileSchema import profile_schema, profiles_schema
-from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from flask import Blueprint, request, jsonify, abort
 profiles = Blueprint('profiles', __name__, url_prefix="/profiles")
 
 
 @profiles.route("/", methods=["GET"])
+@jwt_required
 def show_profiles():
     profiles = Profile.query.all()
     return jsonify(profiles_schema.dump(profiles))
