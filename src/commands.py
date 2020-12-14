@@ -13,6 +13,7 @@ def create_db():
 @db_commands.cli.command("drop")
 def drop_db():
     db.drop_all()
+    db.engine.execute("DROP TABLE IF EXISTS alembic_version;")
     print("Tables deleted!")
 
 
