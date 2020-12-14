@@ -30,6 +30,7 @@ def create_group():
     new_group = Group()
     new_group.name = group_fields["name"]
     new_group.description = group_fields["description"]
+    new_group.admin = group_fields["admin"]
 
     profile.groups.append(new_group)
     db.session.commit()

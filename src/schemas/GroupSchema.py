@@ -9,6 +9,7 @@ class GroupSchema(ma.SQLAlchemyAutoSchema):
 
     name = ma.String(required=True, validate=Length(min=1))
     description = ma.String()
+    admin = ma.Boolean(required=False)
 
 
 group_schema = GroupSchema()
