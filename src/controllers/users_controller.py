@@ -4,9 +4,22 @@ from main import db, bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, abort
-from controllers.helpers import get_user_by_id
 
 users = Blueprint("users", __name__, url_prefix="/users")
+
+
+def get_user_by_id(first=False):
+    user_id = get_jwt_identity()
+
+    if first:
+        user = User.query.filter_by(user_id=user_id).first()
+    elif not first:
+        user = User.query.filter_by(user_id=user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
+
+    return user
 
 
 @users.route("/register", methods=["POST"])

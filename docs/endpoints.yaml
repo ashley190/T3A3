@@ -341,21 +341,21 @@ paths:
           description: "invalid group"
         "404":
           description: "group not found"
-  /group/{group_id}/search:
-    get:
-      tags:
-      - "groups"
-      summary: "Search and display group by id"
-      parameters:
-      - name: "group_id"
-        in: "path"
-        required: true
-        type: "integer"
-      responses:
-        "200":
-          description: "successful operation"
-        "404":
-          description: "not found"
+  # /group/{group_id}/search:
+  #   get:
+  #     tags:
+  #     - "groups"
+  #     summary: "Search and display group by id"
+  #     parameters:
+  #     - name: "group_id"
+  #       in: "path"
+  #       required: true
+  #       type: "integer"
+  #     responses:
+  #       "200":
+  #         description: "successful operation"
+  #       "404":
+  #         description: "not found"
   /group/{group_id}/join:
     post:
       tags:

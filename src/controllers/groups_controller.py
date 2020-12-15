@@ -5,6 +5,7 @@ from models.User import User
 from main import db
 from schemas.GroupSchema import group_schema
 from schemas.GroupMemberSchema import group_members_schema, group_member_schema
+from schemas.ProfileSchema import profile_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Blueprint, request, jsonify, abort
 groups = Blueprint("groups", __name__, url_prefix="/groups")
@@ -122,3 +123,24 @@ def delete_group(id):
             return jsonify(group_schema.dump(group))
 
     return abort(401, description="Unauthorised to delete")
+
+
+@groups.route("/<int:id>/join", methods=["POST"])
+@jwt_required
+def add_member(id):
+    profile = profile_schema.load(request.json, partial=True)
+    user_profile = retrieve_profile(profile["profile_id"])
+
+    group = GroupMembers.query.filter_by(
+        group_id=id, profile_id=user_profile.profile_id).first()
+
+    if not group:
+        new_member = GroupMembers()
+        new_member.group_id = id
+        new_member.profile_id = user_profile.profile_id
+        new_member.admin = False
+        user_profile.groups.append(new_member)
+        db.session.commit()
+        return jsonify(group_member_schema.dump(new_member))
+    else:
+        return abort(401, description="already a member")
