@@ -63,15 +63,12 @@ def get_group_by_id(id):
     if not user:
         return abort(401, description="Invalid user")
 
-    profiles = Profile.query.filter_by(user_id=user.user_id)
+    group = Group.query.filter_by(group_id=id).first()
 
-    group = GroupMembers.query.filter_by(group_id=id).first()
+    if not group:
+        return abort(404, description="Group not found")
 
-    for profile in profiles:
-        if group.profile_id == profile.profile_id:
-            return jsonify(group_member_schema.dump(group))
-
-    return abort(401, description="Unauthorised to view group")
+    return jsonify(group_schema.dump(group))
 
 
 @groups.route("/<int:id>", methods=["PATCH"])
@@ -127,7 +124,7 @@ def delete_group(id):
 
 @groups.route("/<int:id>/join", methods=["POST"])
 @jwt_required
-def add_member(id):
+def join_group(id):
     profile = profile_schema.load(request.json, partial=True)
     user_profile = retrieve_profile(profile["profile_id"])
 
@@ -144,3 +141,47 @@ def add_member(id):
         return jsonify(group_member_schema.dump(new_member))
     else:
         return abort(401, description="already a member")
+
+
+@groups.route("/<int:id>/unjoin", methods=["DELETE"])
+@jwt_required
+def unjoin_group(id):
+    profile = profile_schema.load(request.json, partial=True)
+    user_profile = retrieve_profile(profile["profile_id"])
+
+    group = GroupMembers.query.filter_by(
+        group_id=id, profile_id=user_profile.profile_id).first()
+
+    if not group:
+        return abort(401, description="Not a member of this group")
+
+    db.session.delete(group)
+    db.session.commit()
+
+    return "Unjoined group"
+
+
+@groups.route("/<int:id>/remove_member", methods=["DELETE"])
+@jwt_required
+def remove_member(id):
+    member_profile = profile_schema.load(request.json, partial=True)
+    admin_profile = retrieve_profile(request.args["adminprofile_id"])
+
+    retrieve_member = GroupMembers.query.filter_by(
+        group_id=id, profile_id=member_profile["profile_id"]).first()
+
+    if not retrieve_member:
+        return abort(401, description="Not a member of this group")
+
+    retrieve_admin = GroupMembers.query.filter_by(
+        group_id=id, profile_id=admin_profile.profile_id).first()
+
+    if not retrieve_admin:
+        return abort(401, description="Does not belong to this group")
+
+    if retrieve_admin.admin is True:
+        db.session.delete(retrieve_member)
+        db.session.commit()
+        return f"member {retrieve_member.profile_id} removed."
+    elif retrieve_admin.admin is False:
+        return abort(401, description="Not authorized")

@@ -418,6 +418,11 @@ paths:
         description: "group_id of member to be deleted"
         required: true
         type: "integer"
+      - name: "admin_id"
+        in: "path"
+        description: "admin_id of group to be updated"
+        required: true
+        type: "integer"
       - in: "body"
         name: "body"
         description: "profile_id to be removed"
