@@ -4,7 +4,7 @@ from main import db, bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, abort
-
+from controllers.helpers import get_user_by_id
 
 users = Blueprint("users", __name__, url_prefix="/users")
 
@@ -62,11 +62,7 @@ def get_user():
 @users.route("/", methods=["PATCH"])
 @jwt_required
 def update_user():
-    user_id = get_jwt_identity()
-    user = User.query.filter_by(user_id=user_id)
-
-    if not user:
-        return abort(401, description="Invalid user")
+    user = get_user_by_id()
 
     update_fields = user_schema.load(request.json, partial=True)
     user.update(update_fields)
@@ -81,11 +77,7 @@ def update_user():
 @users.route("/", methods=["DELETE"])
 @jwt_required
 def delete_user():
-    user_id = get_jwt_identity()
-    user = User.query.filter_by(user_id=user_id).first()
-
-    if not user:
-        return abort(401, description="Invalid user")
+    user = get_user_by_id(first=True)
 
     db.session.delete(user)
     db.session.commit()
