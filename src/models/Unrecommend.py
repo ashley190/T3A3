@@ -1,5 +1,4 @@
 from main import db
-from models.Content import Content
 
 
 class Unrecommend(db.Model):
@@ -9,4 +8,4 @@ class Unrecommend(db.Model):
     content_id = db.Column(
         db.Integer, db.ForeignKey('content.content_id'), primary_key=True)
     content = db.relationship(
-        Content, back_populates="profiles", cascade="all, delete")
+        "Content", back_populates="profiles", cascade="all, delete")

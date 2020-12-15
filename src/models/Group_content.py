@@ -1,5 +1,5 @@
 from main import db
-from models.Content import Content
+# from models.Content import Content
 
 
 class GroupContent(db.Model):
@@ -9,4 +9,4 @@ class GroupContent(db.Model):
     content_id = db.Column(db.Integer, db.ForeignKey(
         'content.content_id', ondelete='CASCADE'), primary_key=True)
     content = db.relationship(
-        Content, back_populates="groups", cascade="all, delete")
+        "Content", back_populates="groups", cascade="all, delete")
