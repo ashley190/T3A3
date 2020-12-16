@@ -43,17 +43,6 @@ def seed_db():
     db.session.commit()
     print("User table seeded")
 
-    for i in range(10):
-        restrictions = ("G", "PG", "M", "MA15+", "R18+")
-        profile = Profile()
-        profile.name = faker.first_name_nonbinary()
-        profile.restrictions = random.choice(restrictions)
-        profile.user_id = random.choice(users).user_id
-        db.session.add(profile)
-
-    db.session.commit()
-    print("Profile table seeded")
-
     for i in range(30):
         content = Content()
         content.title = faker.sentence()
@@ -65,11 +54,25 @@ def seed_db():
     db.session.commit()
     print("Content table seeded")
 
-    for i in range(30):
+    for i in range(10):
+        content = random.sample(contents, k=2)
+        restrictions = ("G", "PG", "M", "MA15+", "R18+")
+        profile = Profile()
+        profile.name = faker.first_name_nonbinary()
+        profile.restrictions = random.choice(restrictions)
+        profile.user_id = random.choice(users).user_id
+        profile.unrecommend.extend(content)
+        db.session.add(profile)
+
+    db.session.commit()
+    print("Profile table seeded")
+
+    for i in range(10):
+        content = random.sample(contents, k=3)
         group = Group()
         group.name = faker.word()
         group.description = faker.text()
-        group.content.append(random.choice(contents))
+        group.content.extend(content)
         GroupMembers(
             groups=group, profile_id=random.randrange(1, 11),
             admin=random.choice([0, 1]))
