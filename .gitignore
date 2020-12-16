@@ -3,4 +3,4 @@ __pycache__
 .vscode
 .env
 :testdb:
-src/.DS_Store
+.DS_Store

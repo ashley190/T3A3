@@ -52,19 +52,7 @@ def seed_db():
         db.session.add(profile)
 
     db.session.commit()
-    print("Profile table seeded!")
-
-    for i in range(30):
-        group = Group()
-        group.name = faker.word()
-        group.description = faker.text()
-        GroupMembers(
-            groups=group, profile_id=random.randrange(1, 11),
-            admin=random.choice([0, 1]))
-        db.session.add(group)
-
-    db.session.commit()
-    print("Group table seeded!")
+    print("Profile table seeded")
 
     for i in range(30):
         content = Content()
@@ -76,3 +64,16 @@ def seed_db():
 
     db.session.commit()
     print("Content table seeded")
+
+    for i in range(30):
+        group = Group()
+        group.name = faker.word()
+        group.description = faker.text()
+        group.content.append(random.choice(contents))
+        GroupMembers(
+            groups=group, profile_id=random.randrange(1, 11),
+            admin=random.choice([0, 1]))
+        db.session.add(group)
+
+    db.session.commit()
+    print("Group table seeded")
