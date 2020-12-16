@@ -22,6 +22,7 @@ def seed_db():
     from models.Profile import Profile
     from models.User import User
     from models.Group import Group
+    from models.Content import Content
     from models.Group_members import GroupMembers
     from main import bcrypt
     import random
@@ -29,6 +30,7 @@ def seed_db():
 
     faker = Faker()
     users = []
+    contents = []
 
     for i in range(1, 6):
         user = User()
@@ -63,3 +65,14 @@ def seed_db():
 
     db.session.commit()
     print("Group table seeded!")
+
+    for i in range(30):
+        content = Content()
+        content.title = faker.sentence()
+        content.genre = faker.word()
+        content.year = faker.year()
+        db.session.add(content)
+        contents.append(content)
+
+    db.session.commit()
+    print("Content table seeded")

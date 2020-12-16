@@ -2,10 +2,12 @@ from models.Group import Group
 from models.Group_members import GroupMembers
 from models.Profile import Profile
 from models.User import User
+from models.Content import Content
 from main import db
 from schemas.GroupSchema import group_schema
 from schemas.GroupMemberSchema import group_members_schema, group_member_schema
 from schemas.ProfileSchema import profile_schema
+from schemas.ContentSchema import content_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Blueprint, request, jsonify, abort
 groups = Blueprint("groups", __name__, url_prefix="/groups")
@@ -185,3 +187,64 @@ def remove_member(id):
         return f"member {retrieve_member.profile_id} removed."
     elif retrieve_admin.admin is False:
         return abort(401, description="Not authorized")
+
+
+@groups.route("/<int:id>/content", methods=["POST"])
+@jwt_required
+def add_content(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
+
+    content = content_schema.load(request.json, partial=True)
+    content_search = Content.query.filter_by(
+        content_id=content["content_id"]).first()
+
+    if not content_search:
+        return abort(404, description="content not found")
+
+    group = Group.query.filter_by(group_id=id).first()
+
+    if not group:
+        return abort(404, description="group not found")
+
+    for item in group.content:
+        if item.content_id == content["content_id"]:
+            return abort(401, description="Content already exists")
+
+    group.content.append(content_search)
+    db.session.commit()
+
+    return jsonify(group_schema.dump(group))
+
+
+@groups.route("/<int:id>/content", methods=["DELETE"])
+@jwt_required
+def remove_content(id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
+
+    content = content_schema.load(request.json, partial=True)
+    content_search = Content.query.filter_by(
+        content_id=content["content_id"]).first()
+
+    if not content_search:
+        return abort(404, description="content not found")
+
+    group = Group.query.filter_by(group_id=id).first()
+
+    if not group:
+        return abort(404, description="group not found")
+
+    for item in group.content:
+        if item.content_id == content["content_id"]:
+            group.content.remove(item)
+            db.session.commit()
+            return jsonify(group_schema.dump(group))
+
+    return abort(404, description="Content not found")
