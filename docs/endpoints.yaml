@@ -34,7 +34,7 @@ paths:
         "401":
           description: "email already exists"
   /users/login:
-    get:
+    post:
       tags: 
       - "users"
       summary: "Logs user into system"
@@ -52,20 +52,26 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
+        "401":
           description: "incorrect login credentials"
   /users/:
     get:
       tags: 
       - "users"
       summary: "Get user by user id"
+      description: "Gets user details of the logged in user"
+      parameters:
+      - name: "Bearer token"
+        in: "header"
+        required: true
+        type: "string"
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "Invalid user"
-        "404":
-          description: "User not found"
+        "401":
+          description: "Header required"
+        "422":
+          description: "Invalid token"
     patch:
       tags:
       - "users"
@@ -419,7 +425,7 @@ paths:
         required: true
         type: "integer"
       - name: "admin_id"
-        in: "path"
+        in: "query"
         description: "admin_id of group to be updated"
         required: true
         type: "integer"

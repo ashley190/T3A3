@@ -29,7 +29,7 @@ def users_register():
     user = User.query.filter_by(email=user_fields["email"]).first()
 
     if user:
-        return abort(400, description="Email already registered")
+        return abort(401, description="Email already registered")
 
     user = User()
     user.email = user_fields["email"]
@@ -65,9 +65,6 @@ def users_login():
 def get_user():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-
-    if not user:
-        return abort(404, description="User not found")
 
     return jsonify(user_schema.dump(user))
 
