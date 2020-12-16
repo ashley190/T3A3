@@ -1,4 +1,5 @@
 from models.User import User
+from models.Profile import Profile
 from schemas.UserSchema import user_schema
 from main import db, bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
@@ -66,6 +67,9 @@ def get_user():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
+    if not user:
+        return abort(404, description="User not found")
+
     return jsonify(user_schema.dump(user))
 
 
@@ -77,17 +81,25 @@ def update_user():
     update_fields = user_schema.load(request.json, partial=True)
     user.update(update_fields)
     db.session.commit()
-
-    try:
-        return jsonify(user_schema.dump(user[0]))
-    except IndexError:
-        return abort(404, description="User not found")
+    return jsonify(user_schema.dump(user[0]))
 
 
 @users.route("/", methods=["DELETE"])
 @jwt_required
 def delete_user():
-    user = get_user_by_id(first=True)
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return abort(404, description="User not found")
+
+    profiles = Profile.query.filter_by(user_id=user.user_id)
+
+    for profile in profiles:
+        while len(profile.unrecommend) > 0:
+            for item in profile.unrecommend:
+                profile.unrecommend.remove(item)
+            db.session.commit()
 
     db.session.delete(user)
     db.session.commit()

@@ -1,4 +1,5 @@
 import unittest
+from tests.helpers import Helpers
 from main import create_app, db
 
 
@@ -36,23 +37,34 @@ class TestUsers(unittest.TestCase):
         db.drop_all()
         cls.app_context.pop()
 
-    def post_request(self, endpoint, body):
-        response = self.client.post(endpoint, json=body)
-        data = response.get_json()
-        return (response, data)
+    # def post_request(self, endpoint, header=None, body=None):
+    #     response = self.client.post(endpoint, headers=header, json=body)
+    #     data = response.get_json()
+    #     return (response, data)
 
-    def get_request(self, endpoint, header=None):
-        response = self.client.get(endpoint, headers=header)
-        data = response.get_json()
-        return (response, data)
+    # def get_request(self, endpoint, header=None):
+    #     response = self.client.get(endpoint, headers=header)
+    #     data = response.get_json()
+    #     return (response, data)
+
+    # def patch_request(self, endpoint, header, body):
+    #     response = self.client.patch(endpoint, headers=header, json=body)
+    #     data = response.get_json()
+    #     return (response, data)
+
+    # def delete_request(self, endpoint, header=None):
+    #     response = self.client.delete(endpoint, headers=header)
+    #     data = response.get_json()
+    #     return (response, data)
 
     def test_users_register(self):
+        endpoint = "/users/register"
         body = {
                 "email": "user1@testing.com",
                 "password": "abcdef",
                 "subscription_status": "1"}
-        response, data = self.post_request("/users/register", body)
-        response2, data2 = self.post_request("/users/register", body)
+        response, data = Helpers.post_request(endpoint, body=body)
+        response2, data2 = Helpers.post_request(endpoint, body=body)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["user_id"], 6)
@@ -71,8 +83,8 @@ class TestUsers(unittest.TestCase):
             "email": "test6@test.com",
             "password": "abcdef"
         }
-        response, data = self.post_request(endpoint, body)
-        response2, data2 = self.post_request(endpoint, body2)
+        response, data = Helpers.post_request(endpoint, body=body)
+        response2, data2 = Helpers.post_request(endpoint, body=body2)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("token", data)
@@ -82,9 +94,10 @@ class TestUsers(unittest.TestCase):
 
     def test_get_user(self):
         endpoint = "/users/"
-        response, data = self.get_request(endpoint, self.headers["test1"])
-        response2, data2 = self.get_request(endpoint)
-        response3, data3 = self.get_request(endpoint, self.headers["fakeuser"])
+        response, data = Helpers.get_request(endpoint, self.headers["test1"])
+        response2, data2 = Helpers.get_request(endpoint)
+        response3, data3 = Helpers.get_request(
+            endpoint, self.headers["fakeuser"])
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["user_id"], 1)
@@ -92,6 +105,42 @@ class TestUsers(unittest.TestCase):
         self.assertEqual(response2.status_code, 401)
         self.assertEqual(response3.status_code, 422)
 
-    # def test_update_user(self):
-    #     user = self.get_request("/users/", self.headers["test1"])
-    #     print(user[1])
+    def test_update_user(self):
+        endpoint = "/users/"
+        body = {
+                "email": "abc@test.com",
+                "subscription_status": "false"
+            }
+        body2 = {
+                "email": "123@456.com",
+                "subscription_status": "true"
+            }
+        response, data = Helpers.patch_request(
+            endpoint, self.headers["test1"], body)
+        response2, data2 = Helpers.patch_request(
+            endpoint, self.headers["test2"], body2)
+        user1 = Helpers.get_request(endpoint, self.headers["test1"])
+        user2 = Helpers.get_request(endpoint, self.headers["test2"])
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(len(data), 3)
+        self.assertEqual(user1[1]["email"], "abc@test.com")
+        self.assertEqual(user2[1]["subscription_status"], True)
+
+    def test_delete_user(self):
+        endpoint = "/users/"
+        header = self.headers["test5"]
+
+        before_delete = Helpers.get_request(endpoint, header=header)
+        delete = Helpers.delete_request(endpoint, header=header)
+        after_delete = Helpers.get_request(endpoint, header=header)
+        delete2 = Helpers.delete_request(endpoint, header=header)
+
+        self.assertEqual(before_delete[0].status_code, 200)
+        self.assertEqual(before_delete[1]["user_id"], 5)
+        self.assertEqual(delete[0].status_code, 200)
+        self.assertEqual(delete[1]["user_id"], 5)
+        self.assertEqual(after_delete[0].status_code, 404)
+        self.assertIsNone(after_delete[1])
+        self.assertEqual(delete2[0].status_code, 404)

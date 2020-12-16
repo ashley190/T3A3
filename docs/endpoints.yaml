@@ -70,6 +70,8 @@ paths:
           description: "successful operation"
         "401":
           description: "Header required"
+        "404":
+          description: "User not found"
         "422":
           description: "Invalid token"
     patch:
@@ -78,26 +80,37 @@ paths:
       summary: "Update user details"
       description: "Can only be done by the logged in user"
       parameters:
+      - name: "Bearer token"
+        in: "header"
+        required: true
+        type: "string"
       - name: "subscription"
         in: "body"
         description: "fields to be updated"
         schema:
           type: "object"
           properties:
+            email:
+              type: "string"
             subscription:
               type: "boolean"
       responses:
         "200":
           description: "successful operation"
-        "400":
+        "401":
           description: "invalid user"
-        "404":
-          description: "user not found"
+        "422":
+          description: "Invalid token"
     delete:
       tags:
       - "users"
       summary: "Delete user"
       description: "Can only be done by a logged in user"
+      parameters:
+      - name: "Bearer token"
+        in: "header"
+        required: true
+        type: "string"
       responses:
         "200":
           description: "successful operation"

@@ -12,7 +12,7 @@ class Profile(db.Model):
     restrictions = db.Column(db.String(), nullable=False)
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.user_id"), nullable=False)
-    groups = db.relationship(GroupMembers)
+    groups = db.relationship(GroupMembers, cascade="all, delete")
     unrecommend = db.relationship(
         Content, secondary=unrecommend, lazy="subquery",
         backref=db.backref('profile', lazy=True), cascade="all, delete")
