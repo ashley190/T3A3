@@ -1,5 +1,7 @@
 from main import db
 from models.Group_members import GroupMembers
+from models.Content import Content
+from models.joined_tables import unrecommend
 
 
 class Profile(db.Model):
@@ -11,6 +13,9 @@ class Profile(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.user_id"), nullable=False)
     groups = db.relationship(GroupMembers)
+    unrecommend = db.relationship(
+        Content, secondary=unrecommend, lazy="subquery",
+        backref=db.backref('profile', lazy=True), cascade="all, delete")
 
     def __repr__(self):
         return f"<Profile {self.profile_id}>"

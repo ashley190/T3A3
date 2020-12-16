@@ -210,9 +210,9 @@ def add_content(id):
     if not group:
         return abort(404, description="group not found")
 
-    for item in group.content:
-        if item.content_id == content["content_id"]:
-            return abort(401, description="Content already exists")
+    # for item in group.content:
+    #     if item.content_id == content["content_id"]:
+    #         return abort(401, description="Content already exists")
 
     group.content.append(content_search)
     db.session.commit()
@@ -230,12 +230,6 @@ def remove_content(id):
         return abort(401, description="Invalid user")
 
     content = content_schema.load(request.json, partial=True)
-    content_search = Content.query.filter_by(
-        content_id=content["content_id"]).first()
-
-    if not content_search:
-        return abort(404, description="content not found")
-
     group = Group.query.filter_by(group_id=id).first()
 
     if not group:

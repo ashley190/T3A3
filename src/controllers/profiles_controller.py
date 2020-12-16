@@ -1,7 +1,10 @@
 from models.Profile import Profile
+from models.Content import Content
 from models.User import User
 from main import db
 from schemas.ProfileSchema import profile_schema, profiles_schema
+from schemas.ContentSchema import content_schema, contents_schema
+from controllers.groups_controller import retrieve_profile
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Blueprint, request, jsonify, abort
 profiles = Blueprint('profiles', __name__, url_prefix="/profiles")
@@ -97,3 +100,48 @@ def delete_profile(id):
     db.session.commit()
 
     return jsonify(profile_schema.dump(profile))
+
+
+@profiles.route("/<int:id>/unrecommend", methods=["GET"])
+@jwt_required
+def unrecommended_content(id):
+    profile = retrieve_profile(id)
+
+    return jsonify(contents_schema.dump(profile.unrecommend))
+
+
+@profiles.route("/<int:id>/unrecommend", methods=["PUT"])
+@jwt_required
+def unrecommend_content(id):
+    profile = retrieve_profile(id)
+
+    content = content_schema.load(request.json, partial=True)
+    content_search = Content.query.filter_by(
+        content_id=content["content_id"]).first()
+
+    if not content_search:
+        return abort(404, description="content not found")
+
+    # for item in profile.unrecommend:
+    #     if item.content_id == content["content_id"]:
+    #         return abort(401, description="Content already exists")
+
+    profile.unrecommend.append(content_search)
+    db.session.commit()
+
+    return jsonify(profile_schema.dump(profile))
+
+
+@profiles.route("/<int:id>/unrecommend", methods=["DELETE"])
+@jwt_required
+def remove_content(id):
+    profile = retrieve_profile(id)
+    content = content_schema.load(request.json, partial=True)
+
+    for item in profile.unrecommend:
+        if item.content_id == content["content_id"]:
+            profile.unrecommend.remove(item)
+            db.session.commit()
+            return jsonify(profile_schema.dump(profile))
+
+    return abort(404, description="Content not found")

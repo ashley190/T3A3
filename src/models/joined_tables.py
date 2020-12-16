@@ -9,3 +9,12 @@ group_content = db.Table(
     db.Column(
         'content_id', db.Integer, db.ForeignKey(
             'content.content_id', ondelete='CASCADE'), primary_key=True))
+
+unrecommend = db.Table(
+    'unrecommend',
+    db.Column(
+        'profile_id', db.Integer, db.ForeignKey(
+            'profiles.profile_id', ondelete='CASCADE'), primary_key=True),
+    db.Column(
+        'content_id', db.Integer, db.ForeignKey(
+            'content.content_id', ondelete='CASCADE'), primary_key=True))

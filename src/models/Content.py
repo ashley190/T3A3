@@ -1,6 +1,5 @@
 from main import db
-# from models.Group import Group
-from models.joined_tables import group_content
+from models.joined_tables import group_content, unrecommend
 
 
 class Content(db.Model):
@@ -12,6 +11,8 @@ class Content(db.Model):
     year = db.Column(db.Integer)
     groups = db.relationship(
         "Group", secondary=group_content, backref=db.backref("contents"))
+    profiles = db.relationship(
+        "Profile", secondary=unrecommend, backref=db.backref("contents"))
 
     def __repr__(self):
         return f"<Content {self.content_id}>"
