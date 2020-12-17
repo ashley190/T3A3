@@ -16,6 +16,9 @@ def show_profiles():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
+    if not user:
+        return abort(401, description="Invalid user")
+
     profiles = Profile.query.filter_by(user_id=user.user_id)
 
     return jsonify(profiles_schema.dump(profiles))
@@ -96,6 +99,11 @@ def delete_profile(id):
     if not profile:
         return abort(404, description="Profile not found")
 
+    while len(profile.unrecommend) > 0:
+        for item in profile.unrecommend:
+            profile.unrecommend.remove(item)
+        db.session.commit()
+
     db.session.delete(profile)
     db.session.commit()
 
@@ -129,7 +137,7 @@ def unrecommend_content(id):
     profile.unrecommend.append(content_search)
     db.session.commit()
 
-    return jsonify(profile_schema.dump(profile))
+    return jsonify(contents_schema.dump(profile.unrecommend))
 
 
 @profiles.route("/<int:id>/unrecommend", methods=["DELETE"])
@@ -142,6 +150,6 @@ def remove_content(id):
         if item.content_id == content["content_id"]:
             profile.unrecommend.remove(item)
             db.session.commit()
-            return jsonify(profile_schema.dump(profile))
+            return jsonify(contents_schema.dump(profile.unrecommend))
 
     return abort(404, description="Content not found")

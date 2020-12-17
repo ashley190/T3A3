@@ -24,7 +24,21 @@ class Helpers():
         return (response, data)
 
     @classmethod
-    def delete_request(cls, endpoint, header=None):
-        response = cls.client.delete(endpoint, headers=header)
+    def put_request(cls, endpoint, header, body):
+        response = cls.client.put(endpoint, headers=header, json=body)
         data = response.get_json()
         return (response, data)
+
+    @classmethod
+    def delete_request(cls, endpoint, header=None, body=None):
+        response = cls.client.delete(endpoint, headers=header, json=body)
+        data = response.get_json()
+        return (response, data)
+
+    @classmethod
+    def get_profile_id(cls, header):
+        profile_ids = []
+        response, data = Helpers.get_request("/profiles/", header=header)
+        for profile in data:
+            profile_ids.append(profile["profile_id"])
+        return profile_ids

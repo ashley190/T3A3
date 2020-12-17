@@ -37,26 +37,6 @@ class TestUsers(unittest.TestCase):
         db.drop_all()
         cls.app_context.pop()
 
-    # def post_request(self, endpoint, header=None, body=None):
-    #     response = self.client.post(endpoint, headers=header, json=body)
-    #     data = response.get_json()
-    #     return (response, data)
-
-    # def get_request(self, endpoint, header=None):
-    #     response = self.client.get(endpoint, headers=header)
-    #     data = response.get_json()
-    #     return (response, data)
-
-    # def patch_request(self, endpoint, header, body):
-    #     response = self.client.patch(endpoint, headers=header, json=body)
-    #     data = response.get_json()
-    #     return (response, data)
-
-    # def delete_request(self, endpoint, header=None):
-    #     response = self.client.delete(endpoint, headers=header)
-    #     data = response.get_json()
-    #     return (response, data)
-
     def test_users_register(self):
         endpoint = "/users/register"
         body = {

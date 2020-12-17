@@ -118,30 +118,7 @@ paths:
           description: "invalid user"
         "404":
           description: "user not found"
-  /profile/create:
-    post:
-      tags:
-      - "profile"
-      summary: "Create new profile under user_id"
-      parameters:
-        - in: "body"
-          name: "body"
-          description: "Creates new profile under user_id"
-          schema:
-            type: "object"
-            properties:
-              name:
-                type: "string"
-              restrictions:
-                type: "string"
-      responses:
-        "200":
-          description: "successful operation"
-        "400":
-          description: "Invalid user"
-        "404":
-          description: "User not found"
-  /profile:
+  /profiles/:
     get:
       tags:
       - "profile"
@@ -149,11 +126,27 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
+        "401":
+          description: "Invalid user"
+        "422":
+          description: "Invalid token"
+  /profiles/{profile_id}:
+    get:
+      tags:
+      - "profile"
+      summary: "View profile by id"
+      parameters:
+      - name: "profile_id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
           description: "Invalid user"
         "404":
           description: "user not found"
-  /profile/{profile_id}:
     patch:
       tags:
       - "profile"
@@ -176,7 +169,7 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
+        "401":
           description: "invalid profile"
         "404":
           description: "profile not found"
@@ -193,11 +186,34 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "invalid profile"
+        "401":
+          description: "invalid user"
         "404":
           description: "profile not found"
-  /profile/{profile_id}/unrecommend:
+  /profiles/create:
+    post:
+      tags:
+      - "profile"
+      summary: "Create new profile under user_id"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Creates new profile under user_id"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              restrictions:
+                type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Invalid user"
+        "400":
+          description: "Invalid fields entered"
+  /profiles/{profile_id}/unrecommend:
     get:
       tags:
       - "profile"
@@ -211,6 +227,8 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "401":
+          description: "Invalid user"
         "404":
           description: "not found"
     put:
@@ -234,8 +252,10 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "401":
+          descripton: "Invalid user"
         "404":
-          description: "not found"
+          description: "Profile/Content not found"
     delete:
       tags:
       - "profile"
@@ -257,10 +277,10 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "unauthorized"
+        "401":
+          description: "Invalid user"
         "404":
-          description: "not found"
+          description: "Profile/Content not found"
   /groups/create:
     post:
       tags:

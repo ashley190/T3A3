@@ -9,20 +9,6 @@ from flask import Blueprint, request, jsonify, abort
 users = Blueprint("users", __name__, url_prefix="/users")
 
 
-def get_user_by_id(first=False):
-    user_id = get_jwt_identity()
-
-    if first:
-        user = User.query.filter_by(user_id=user_id).first()
-    elif not first:
-        user = User.query.filter_by(user_id=user_id)
-
-    if not user:
-        return abort(401, description="Invalid user")
-
-    return user
-
-
 @users.route("/register", methods=["POST"])
 def users_register():
     user_fields = user_schema.load(request.json)
@@ -76,7 +62,12 @@ def get_user():
 @users.route("/", methods=["PATCH"])
 @jwt_required
 def update_user():
-    user = get_user_by_id()
+    user_id = get_jwt_identity()
+
+    user = User.query.filter_by(user_id=user_id)
+
+    if not user:
+        return abort(401, description="Invalid user")
 
     update_fields = user_schema.load(request.json, partial=True)
     user.update(update_fields)
