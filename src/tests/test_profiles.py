@@ -39,6 +39,28 @@ class TestProfiles(unittest.TestCase):
         db.drop_all()
         cls.app_context.pop()
 
+    def generate_profile_endpoints(self, header):
+        profile_ids = Helpers.get_profile_id(header)
+
+        while len(profile_ids) == 0:
+            self.tearDown()
+            self.setUp()
+            profile_ids = Helpers.get_profile_id(header)
+        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
+
+        endpoint1 = f"/profiles/{random.choice(profile_ids)}"
+        endpoint2 = f"/profiles/{random.choice(non_profile_ids)}"
+        return(endpoint1, endpoint2)
+
+    def get_unrecommended_content(self, endpoint, header):
+        get_content = Helpers.get_request(endpoint, header=header)
+        unrecommended = []
+        for content in get_content[1]:
+            unrecommended.append(content["content_id"])
+
+        available_content = [i for i in range(1, 31) if i not in unrecommended]
+        return (unrecommended, available_content)
+
     def test_show_profiles(self):
         endpoint = "/profiles/"
         response, data = Helpers.get_request(
@@ -74,17 +96,8 @@ class TestProfiles(unittest.TestCase):
 
     def test_get_profile_by_id(self):
         header = self.headers["test2"]
-        profile_ids = Helpers.get_profile_id(header)
+        endpoint1, endpoint2 = self.generate_profile_endpoints(header)
 
-        while len(profile_ids) == 0:
-            self.tearDown()
-            self.setUp()
-            profile_ids = Helpers.get_profile_id(header)
-
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
-
-        endpoint1 = f"/profiles/{profile_ids[0]}"
-        endpoint2 = f"/profiles/{non_profile_ids[0]}"
         response, data = Helpers.get_request(endpoint1, header=header)
         response2, data2 = Helpers.get_request(endpoint2, header=header)
 
@@ -95,17 +108,8 @@ class TestProfiles(unittest.TestCase):
 
     def test_delete_profile(self):
         header = self.headers["test3"]
-        profile_ids = Helpers.get_profile_id(header)
+        endpoint1, endpoint2 = self.generate_profile_endpoints(header)
 
-        while len(profile_ids) == 0:
-            self.tearDown()
-            self.setUp()
-            profile_ids = Helpers.get_profile_id(header)
-
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
-
-        endpoint1 = f"/profiles/{profile_ids[0]}"
-        endpoint2 = f"/profiles/{non_profile_ids[0]}"
         response, data = Helpers.delete_request(endpoint1, header=header)
         response2, data2 = Helpers.delete_request(endpoint2, header=header)
 
@@ -116,16 +120,10 @@ class TestProfiles(unittest.TestCase):
 
     def test_unrecommended_content(self):
         header = self.headers["test4"]
-        profile_ids = Helpers.get_profile_id(header)
+        endpoint1, endpoint2 = self.generate_profile_endpoints(header)
+        endpoint1 = endpoint1 + "/unrecommend"
+        endpoint2 = endpoint2 + "/unrecommend"
 
-        while len(profile_ids) == 0:
-            self.tearDown()
-            self.setUp()
-            profile_ids = Helpers.get_profile_id(header)
-
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
-        endpoint1 = f"/profiles/{profile_ids[0]}/unrecommend"
-        endpoint2 = f"/profiles/{non_profile_ids[0]}/unrecommend"
         response, data = Helpers.get_request(endpoint1, header=header)
         response2, data2 = Helpers.get_request(endpoint2, header=header)
 
@@ -136,23 +134,12 @@ class TestProfiles(unittest.TestCase):
 
     def test_unrecommend_content(self):
         header = self.headers["test4"]
-        profile_ids = Helpers.get_profile_id(header)
+        endpoint1, endpoint2 = self.generate_profile_endpoints(header)
+        endpoint1 = endpoint1 + "/unrecommend"
+        endpoint2 = endpoint2 + "/unrecommend"
 
-        while len(profile_ids) == 0:
-            self.tearDown()
-            self.setUp()
-            profile_ids = Helpers.get_profile_id(header)
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
-
-        endpoint1 = f"/profiles/{profile_ids[0]}/unrecommend"
-        endpoint2 = f"/profiles/{non_profile_ids[0]}/unrecommend"
-
-        get_content = Helpers.get_request(endpoint1, header=header)
-        unrecommended = []
-        for content in get_content[1]:
-            unrecommended.append(content["content_id"])
-
-        available_content = [i for i in range(1, 31) if i not in unrecommended]
+        unrecommended, available_content = self.get_unrecommended_content(
+            endpoint1, header)
         body1 = {
             "content_id": random.choice(available_content)
         }
@@ -175,23 +162,12 @@ class TestProfiles(unittest.TestCase):
 
     def test_remove_content(self):
         header = self.headers["test5"]
-        profile_ids = Helpers.get_profile_id(header)
+        endpoint1, endpoint2 = self.generate_profile_endpoints(header)
+        endpoint1 = endpoint1 + "/unrecommend"
+        endpoint2 = endpoint2 + "/unrecommend"
 
-        while len(profile_ids) == 0:
-            self.tearDown()
-            self.setUp()
-            profile_ids = Helpers.get_profile_id(header)
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
-
-        endpoint1 = f"/profiles/{profile_ids[0]}/unrecommend"
-        endpoint2 = f"/profiles/{non_profile_ids[0]}/unrecommend"
-
-        get_content = Helpers.get_request(endpoint1, header=header)
-        unrecommended = []
-        for content in get_content[1]:
-            unrecommended.append(content["content_id"])
-
-        available_content = [i for i in range(1, 31) if i not in unrecommended]
+        unrecommended, available_content = self.get_unrecommended_content(
+            endpoint1, header)
         body1 = {
             "content_id": random.choice(unrecommended)
         }

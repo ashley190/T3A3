@@ -29,7 +29,7 @@ def retrieve_profile(id):
     return profile
 
 
-@groups.route("/create", methods=["POST"])
+@groups.route("/", methods=["POST"])
 @jwt_required
 def create_group():
     profile = retrieve_profile(request.args["profile_id"])
