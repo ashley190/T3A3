@@ -76,25 +76,17 @@ def get_group_by_id(id):
 @groups.route("/<int:id>", methods=["PATCH"])
 @jwt_required
 def update_group(id):
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    profile = retrieve_profile(request.args["profile_id"])
+    group = GroupMembers.query.filter_by(
+        group_id=id, profile_id=profile.profile_id).first()
+    group_search = Group.query.filter_by(group_id=id)
 
-    if not user:
-        return abort(401, description="Invalid user")
-
-    profiles = Profile.query.filter_by(user_id=user.user_id)
-    group_members = GroupMembers.query.filter_by(group_id=id).first()
     group_fields = group_schema.load(request.json, partial=True)
-    group = Group.query.filter_by(group_id=id)
-
-    for profile in profiles:
-        if group_members.profile_id == profile.profile_id and (
-                group_members.admin):
-            group.update(group_fields)
-            db.session.commit()
-            return jsonify(group_schema.dump(group[0]))
-
-    return abort(401, description="Unauthorised to update")
+    if group.admin:
+        group_search.update(group_fields)
+        db.session.commit()
+        return jsonify(group_schema.dump(group_search[0]))
+    return abort(401, description="Not Group Admin")
 
 
 @groups.route("/<int:id>", methods=["DELETE"])

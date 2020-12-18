@@ -52,29 +52,57 @@ class TestGroups(unittest.TestCase):
         endpoint2 = f"/groups/?profile_id={random.choice(non_profile_ids)}"
         return(endpoint1, endpoint2)
 
-    def test_create_group(self):
-        header = self.headers["test1"]
-        endpoint1, endpoint2 = self.generate_group_endpoints(header)
+    # def test_create_group(self):
+    #     header = self.headers["test1"]
+    #     endpoint1, endpoint2 = self.generate_group_endpoints(header)
 
-        body1 = {
-            "name": "New group",
-            "description": "New netflix group with friends"
-        }
-        body2 = {
-            "name": "",
-            "description": ""
-        }
+    #     body1 = {
+    #         "name": "New group",
+    #         "description": "New netflix group with friends"
+    #     }
+    #     body2 = {
+    #         "name": "",
+    #         "description": ""
+    #     }
 
-        response, data = Helpers.post_request(
-            endpoint1, header=header, body=body1)
-        response2, data2 = Helpers.post_request(
-            endpoint2, header=header, body=body1)
-        response3, data3 = Helpers.post_request(
-            endpoint1, header=header, body=body2)
+    #     response, data = Helpers.post_request(
+    #         endpoint1, header=header, body=body1)
+    #     response2, data2 = Helpers.post_request(
+    #         endpoint2, header=header, body=body1)
+    #     response3, data3 = Helpers.post_request(
+    #         endpoint1, header=header, body=body2)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(data, dict)
-        self.assertEqual(response2.status_code, 404)
-        self.assertIsNone(data2)
-        self.assertEqual(response3.status_code, 400)
-        self.assertEqual(data3["name"], ['Shorter than minimum length 1.'])
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertIsInstance(data, dict)
+    #     self.assertEqual(response2.status_code, 404)
+    #     self.assertIsNone(data2)
+    #     self.assertEqual(response3.status_code, 400)
+    #     self.assertEqual(data3["name"], ['Shorter than minimum length 1.'])
+
+    # def test_get_groups(self):
+    #     header = self.headers["test2"]
+    #     endpoint1, endpoint2 = self.generate_group_endpoints(header)
+
+    #     response, data = Helpers.get_request(endpoint1, header=header)
+    #     response2, data2 = Helpers.get_request(endpoint2, header=header)
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response2.status_code, 404)
+    #     self.assertIsInstance(data, list)
+    #     self.assertIsNone(data2)
+
+    # def test_get_group_by_id(self):
+    #     header = self.headers["test3"]
+    #     endpoint1 = f"/groups/{random.randrange(1, 11)}"
+    #     endpoint2 = "/groups/31"
+
+    #     response, data = Helpers.get_request(endpoint1, header=header)
+    #     response2, data2 = Helpers.get_request(endpoint2, header=header)
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response2.status_code, 404)
+    #     self.assertEqual(len(data), 4)
+    #     self.assertIsNone(data2)
+
+    def test_group_update(self):
+        pass
