@@ -253,7 +253,7 @@ paths:
         "200":
           description: "successful operation"
         "401":
-          description: "Invalid user"
+          descripton: "Invalid user"
         "404":
           description: "Profile/Content not found"
     delete:
@@ -339,13 +339,21 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "401":
+          description: "invalid user"
         "404":
           description: "not found"
     patch:
       tags:
       - "groups"
       summary: "Update group details"
+      description: "Only can be done by group admin"
       parameters:
+      - name: "profile_id"
+        in: "query"
+        description: "Profile_id for profile search"
+        required: true
+        type: "integer"
       - name: "group_id"
         in: "path"
         required: true
@@ -364,13 +372,22 @@ paths:
         "200":
           description: "successful operation"
         "400":
-          description: "Invalid input"
+          description: "Invalid field(s)"
+        "401":
+          description: "Invalid user/Unauthorised to update"
+        "404":
+          description: "Profile/Group not found"
     delete:
       tags:
       - "groups"
       summary: "Delete group"
-      description: "Can only be performed by group creator"
+      description: "Can only be performed by group admin"
       parameters:
+      - name: "profile_id"
+        in: "query"
+        description: "Profile_id for profile search"
+        required: true
+        type: "integer"
       - name: "group_id"
         in: "path"
         description: "group_id of group to be deleted"
@@ -379,25 +396,10 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "invalid group"
+        "401":
+          description: "invalid user/Unauthorised to delete"
         "404":
           description: "group not found"
-  # /group/{group_id}/search:
-  #   get:
-  #     tags:
-  #     - "groups"
-  #     summary: "Search and display group by id"
-  #     parameters:
-  #     - name: "group_id"
-  #       in: "path"
-  #       required: true
-  #       type: "integer"
-  #     responses:
-  #       "200":
-  #         description: "successful operation"
-  #       "404":
-  #         description: "not found"
   /group/{group_id}/join:
     post:
       tags:
