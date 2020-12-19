@@ -104,5 +104,65 @@ class TestGroups(unittest.TestCase):
     #     self.assertEqual(len(data), 4)
     #     self.assertIsNone(data2)
 
-    def test_group_update(self):
-        pass
+    # def test_group_update(self):
+    #     header = self.headers["test3"]
+    #     profile_ids = Helpers.get_profile_id(header)
+
+    #     groups = Helpers.get_request(
+    #         f"/groups/?profile_id={profile_ids[0]}", header=header)
+    #     group_ids = []
+    #     for group in groups[1]:
+    #         if group["admin"]:
+    #             group_ids.append(group["groups"]["group_id"])
+    #     non_group_ids = [i for i in range(1, 11) if i not in group_ids]
+
+    #     endpoint1 = f"/groups/{group_ids[0]}?profile_id={profile_ids[0]}"
+    #     endpoint2 = f"/groups/{non_group_ids[0]}?profile_id={profile_ids[0]}"
+    #     body1 = {
+    #         "name": "New group name",
+    #         "description": "New group description"
+    #     }
+    #     body2 = {
+    #         "name": "",
+    #         "description": ""
+    #     }
+
+    #     response, data = Helpers.patch_request(endpoint1, header, body1)
+    #     response2, data2 = Helpers.patch_request(endpoint2, header, body1)
+    #     response3, data3 = Helpers.patch_request(endpoint1, header, body2)
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response2.status_code, 404)
+    #     self.assertEqual(response3.status_code, 400)
+    #     self.assertEqual(data["name"], "New group name")
+    #     self.assertEqual(data["description"], "New group description")
+    #     self.assertIsNone(data2)
+    #     self.assertIsInstance(data3, dict)
+
+    def test_group_delete(self):
+        header = self.headers["test4"]
+        profile_ids = Helpers.get_profile_id(header)
+        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
+
+        groups = Helpers.get_request(
+            f"/groups/?profile_id={profile_ids[0]}", header=header)
+        group_ids = []
+        for group in groups[1]:
+            if group["admin"]:
+                group_ids.append(group["groups"]["group_id"])
+        non_group_ids = [i for i in range(1, 11) if i not in group_ids]
+
+        endpoint1 = f"/groups/{group_ids[0]}?profile_id={profile_ids[0]}"
+        endpoint2 = f"/groups/{non_group_ids[0]}?profile_id={profile_ids[0]}"
+        endpoint3 = f"/groups/{group_ids[0]}?profile_id={non_profile_ids[0]}"
+
+        response, data = Helpers.delete_request(endpoint1, header=header)
+        response2, data2 = Helpers.delete_request(endpoint2, header=header)
+        response3, data3 = Helpers.delete_request(endpoint3, header=header)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(data, dict)
+        self.assertEqual(response2.status_code, 404)
+        self.assertIsNone(data2)
+        self.assertEqual(response3.status_code, 404)
+        self.assertIsNone(data3)

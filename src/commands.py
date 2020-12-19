@@ -31,6 +31,8 @@ def seed_db():
     faker = Faker()
     users = []
     contents = []
+    profile_ids = list(range(1, 11))
+    random.shuffle(profile_ids)
 
     for i in range(1, 6):
         user = User()
@@ -74,8 +76,8 @@ def seed_db():
         group.description = faker.text()
         group.content.extend(content)
         GroupMembers(
-            groups=group, profile_id=random.randrange(1, 11),
-            admin=random.choice([0, 1]))
+            groups=group, profile_id=profile_ids.pop(0),
+            admin=True)
         db.session.add(group)
 
     db.session.commit()

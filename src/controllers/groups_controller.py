@@ -81,37 +81,37 @@ def update_group(id):
         group_id=id, profile_id=profile.profile_id).first()
     group_search = Group.query.filter_by(group_id=id)
 
+    if not group:
+        return abort(404, description="Group not found")
+
     group_fields = group_schema.load(request.json, partial=True)
     if group.admin:
         group_search.update(group_fields)
         db.session.commit()
         return jsonify(group_schema.dump(group_search[0]))
-    return abort(401, description="Not Group Admin")
+    return abort(401, description="Unauthorised to update")
 
 
 @groups.route("/<int:id>", methods=["DELETE"])
 @jwt_required
 def delete_group(id):
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    profile = retrieve_profile(request.args["profile_id"])
+    group = GroupMembers.query.filter_by(
+        group_id=id, profile_id=profile.profile_id).first()
+    group_search = Group.query.filter_by(group_id=id).first()
 
-    if not user:
-        return abort(401, description="Invalid user")
-
-    profiles = Profile.query.filter_by(user_id=user.user_id)
-    group_members = GroupMembers.query.filter_by(group_id=id).first()
-    group = Group.query.filter_by(group_id=id).first()
-
-    if not group_members and not group:
+    if not group or not group_search:
         return abort(404, description="Group not found")
 
-    for profile in profiles:
-        if group_members.profile_id == profile.profile_id and (
-                group_members.admin):
-            db.session.delete(group)
-            db.session.delete(group_members)
+    if group.admin:
+        while len(group_search.content) > 0:
+            for item in group_search.content:
+                group_search.content.remove(item)
             db.session.commit()
-            return jsonify(group_schema.dump(group))
+        db.session.delete(group)
+        db.session.delete(group_search)
+        db.session.commit()
+        return jsonify(group_schema.dump(group_search))
 
     return abort(401, description="Unauthorised to delete")
 
