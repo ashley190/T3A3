@@ -23,7 +23,7 @@ jobs:
         FLASK_ENV: testing
       run: |
         cd src
-        python -m unittest discover -s tests/
+        python -m unittest discover -s tests/ -v
     - name: Style Check
       run: |
         cd src
