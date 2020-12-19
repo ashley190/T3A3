@@ -253,7 +253,7 @@ paths:
         "200":
           description: "successful operation"
         "401":
-          descripton: "Invalid user"
+          description: "Invalid user"
         "404":
           description: "Profile/Content not found"
     delete:
