@@ -1,6 +1,7 @@
 from models.Profile import Profile
 from models.Content import Content
 from models.User import User
+from models.Group_members import GroupMembers
 from main import db
 from schemas.ProfileSchema import profile_schema, profiles_schema
 from schemas.ContentSchema import content_schema, contents_schema
@@ -104,6 +105,11 @@ def delete_profile(id):
             profile.unrecommend.remove(item)
         db.session.commit()
 
+    groups = GroupMembers.query.filter_by(profile_id=profile.profile_id)
+    for group in groups:
+        db.session.delete(group)
+        db.session.commit()
+
     db.session.delete(profile)
     db.session.commit()
 
@@ -129,10 +135,6 @@ def unrecommend_content(id):
 
     if not content_search:
         return abort(404, description="content not found")
-
-    # for item in profile.unrecommend:
-    #     if item.content_id == content["content_id"]:
-    #         return abort(401, description="Content already exists")
 
     profile.unrecommend.append(content_search)
     db.session.commit()
