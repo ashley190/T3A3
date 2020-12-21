@@ -326,7 +326,7 @@ paths:
           description: "invalid user"
         "404":
           description: "Profile not found"
-  /group/{group_id}:
+  /groups/{group_id}:
     get:
       tags:
       - "groups"
@@ -400,7 +400,7 @@ paths:
           description: "invalid user/Unauthorised to delete"
         "404":
           description: "group not found"
-  /group/{group_id}/join:
+  /groups/{group_id}/join:
     post:
       tags:
       - "groups"
@@ -421,9 +421,11 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "401": 
+          description: "Already a member"
         "404":
-          description: "not found"
-  /group/{group_id}/unjoin:
+          description: "User/Profile not found"
+  /groups/{group_id}/unjoin:
     delete:
       tags:
       - "groups"
@@ -432,7 +434,7 @@ paths:
       parameters:
       - name: "group_id"
         in: "path"
-        description: "group_id of group to be deleted"
+        description: "group_id of group to unjoined"
         required: true
         type: "integer"
       - in: "body"
@@ -446,11 +448,11 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "unauthorized"
+        "401":
+          description: "Not a member"
         "404":
-          description: "not found"
-  /group/{group_id}/remove_member:
+          description: "Group/profile not found"
+  /groups/{group_id}/remove_member:
     delete:
       tags:
       - "groups"
@@ -462,26 +464,23 @@ paths:
         description: "group_id of member to be deleted"
         required: true
         type: "integer"
-      - name: "admin_id"
-        in: "query"
-        description: "admin_id of group to be updated"
-        required: true
-        type: "integer"
       - in: "body"
         name: "body"
         description: "profile_id to be removed"
         schema:
           type: "object"
           properties:
+            admin_id:
+              type: "integer"
             profile_id:
               type: "integer"
       responses:
         "200":
           description: "successful operation"
-        "400":
-          description: "unauthorized"
+        "401":
+          description: "invalid user/not admin of this group"
         "404":
-          description: "not found"
+          description: "profile/member/group not found"
   /group/{group_id}/content:
     post:
       tags:

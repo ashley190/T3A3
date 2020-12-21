@@ -161,27 +161,29 @@ def unjoin_group(id):
 @groups.route("/<int:id>/remove_member", methods=["DELETE"])
 @jwt_required
 def remove_member(id):
-    member_profile = profile_schema.load(request.json, partial=True)
-    admin_profile = retrieve_profile(request.args["adminprofile_id"])
+    profile_ids = request.json
+    member_id = profile_ids["member_id"]
+    admin_id = profile_ids["admin_id"]
+
+    admin_profile = retrieve_profile(admin_id)
 
     retrieve_member = GroupMembers.query.filter_by(
-        group_id=id, profile_id=member_profile["profile_id"]).first()
+        group_id=id, profile_id=member_id).first()
 
     if not retrieve_member:
-        return abort(401, description="Not a member of this group")
+        return abort(404, description="Not a member of this group")
 
     retrieve_admin = GroupMembers.query.filter_by(
-        group_id=id, profile_id=admin_profile.profile_id).first()
+        group_id=id, profile_id=admin_profile.profile_id, admin=True).first()
 
     if not retrieve_admin:
-        return abort(401, description="Does not belong to this group")
+        return abort(401, description="Not admin of this group")
 
-    if retrieve_admin.admin is True:
-        db.session.delete(retrieve_member)
-        db.session.commit()
-        return f"member {retrieve_member.profile_id} removed."
-    elif retrieve_admin.admin is False:
-        return abort(401, description="Not authorized")
+    db.session.delete(retrieve_member)
+    db.session.commit()
+    return jsonify({
+        "member_id": f"{profile_ids['member_id']}",
+        "status": "removed from group"})
 
 
 @groups.route("/<int:id>/content", methods=["POST"])

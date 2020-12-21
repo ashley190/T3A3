@@ -10,7 +10,6 @@ class GroupMemberSchema(ma.SQLAlchemyAutoSchema):
     profile_id = ma.Integer(required=True)
     admin = ma.Boolean(required=True)
     groups = ma.Nested(GroupSchema)
-    # profile = ma.Nested(ProfileSchema)
 
 
 group_member_schema = GroupMemberSchema()
