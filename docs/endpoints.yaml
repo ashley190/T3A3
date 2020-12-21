@@ -491,6 +491,11 @@ paths:
         in: "path"
         required: true
         type: "integer"
+      - name: "profile_id"
+        in: "query"
+        description: "Profile_id for profile search"
+        required: true
+        type: "integer"
       - in: "body"
         name: "body"
         description: "adds content_id to group"
@@ -502,8 +507,10 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "401":
+          description: "Invalid member/content"
         "404":
-          description: "not found"
+          description: "Content not found"
     delete:
       tags:
       - "groups"

@@ -96,24 +96,29 @@ def update_group(id):
 @jwt_required
 def delete_group(id):
     profile = retrieve_profile(request.args["profile_id"])
-    group = GroupMembers.query.filter_by(
-        group_id=id, profile_id=profile.profile_id).first()
+    group_members = GroupMembers.query.filter_by(
+        group_id=id, admin=False).all()
+    admin_check = GroupMembers.query.filter_by(
+        group_id=id, profile_id=profile.profile_id, admin=True).first()
     group_search = Group.query.filter_by(group_id=id).first()
 
-    if not group or not group_search:
-        return abort(404, description="Group not found")
+    if not admin_check:
+        return abort(401, description="Not group admin")
 
-    if group.admin:
-        while len(group_search.content) > 0:
-            for item in group_search.content:
-                group_search.content.remove(item)
-            db.session.commit()
-        db.session.delete(group)
-        db.session.delete(group_search)
+    while len(group_search.content) > 0:
+        for content in group_search.content:
+            group_search.content.remove(content)
         db.session.commit()
-        return jsonify(group_schema.dump(group_search))
 
-    return abort(401, description="Unauthorised to delete")
+    for member in group_members:
+        db.session.delete(member)
+    db.session.commit()
+
+    db.session.delete(admin_check)
+    db.session.delete(group_search)
+    db.session.commit()
+
+    return jsonify(group_schema.dump(group_search))
 
 
 @groups.route("/<int:id>/join", methods=["POST"])
@@ -189,32 +194,29 @@ def remove_member(id):
 @groups.route("/<int:id>/content", methods=["POST"])
 @jwt_required
 def add_content(id):
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    profile = retrieve_profile(request.args["profile_id"])
 
-    if not user:
-        return abort(401, description="Invalid user")
-
-    content = content_schema.load(request.json, partial=True)
-    content_search = Content.query.filter_by(
-        content_id=content["content_id"]).first()
-
-    if not content_search:
-        return abort(404, description="content not found")
-
-    group = Group.query.filter_by(group_id=id).first()
+    group = GroupMembers.query.filter_by(
+        profile_id=profile.profile_id, group_id=id).first()
 
     if not group:
-        return abort(404, description="group not found")
+        return abort(401, description="Not a member of this group")
 
-    # for item in group.content:
-    #     if item.content_id == content["content_id"]:
-    #         return abort(401, description="Content already exists")
+    group_contents = []
+    for content in group.groups.content:
+        group_contents.append(content)
 
-    group.content.append(content_search)
+    content_field = content_schema.load(request.json, partial=True)
+    content = Content.query.get(content_field["content_id"])
+
+    if not content:
+        return abort(404, description="content not found")
+    elif content in group_contents:
+        return abort(401, description="Content already in group")
+
+    group.groups.content.append(content)
     db.session.commit()
-
-    return jsonify(group_schema.dump(group))
+    return jsonify(group_member_schema.dump(group))
 
 
 @groups.route("/<int:id>/content", methods=["DELETE"])
