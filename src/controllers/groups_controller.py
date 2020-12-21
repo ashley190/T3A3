@@ -152,7 +152,10 @@ def unjoin_group(id):
     db.session.delete(group)
     db.session.commit()
 
-    return "Unjoined group"
+    return jsonify({
+        "profile_id": user_profile.profile_id,
+        "group_id": group.group_id,
+        "status": "Successfully unjoined"})
 
 
 @groups.route("/<int:id>/remove_member", methods=["DELETE"])

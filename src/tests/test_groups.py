@@ -39,7 +39,7 @@ class TestGroups(unittest.TestCase):
         db.drop_all()
         cls.app_context.pop()
 
-    def generate_group_endpoints(self, header):
+    def get_profile_ids(self, header):
         profile_ids = Helpers.get_profile_id(header)
 
         while len(profile_ids) == 0:
@@ -47,6 +47,10 @@ class TestGroups(unittest.TestCase):
             self.setUp()
             profile_ids = Helpers.get_profile_id(header)
         non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
+        return(profile_ids, non_profile_ids)
+
+    def generate_group_endpoints(self, header):
+        profile_ids, non_profile_ids = self.get_profile_ids(header)
 
         endpoint1 = f"/groups/?profile_id={random.choice(profile_ids)}"
         endpoint2 = f"/groups/?profile_id={random.choice(non_profile_ids)}"
@@ -141,8 +145,7 @@ class TestGroups(unittest.TestCase):
 
     def test_group_delete(self):
         header = self.headers["test4"]
-        profile_ids = Helpers.get_profile_id(header)
-        non_profile_ids = [i for i in range(1, 11) if i not in profile_ids]
+        profile_ids, non_profile_ids = self.get_profile_ids(header)
 
         groups = Helpers.get_request(
             f"/groups/?profile_id={profile_ids[0]}", header=header)
@@ -163,6 +166,85 @@ class TestGroups(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(data, dict)
         self.assertEqual(response2.status_code, 404)
+        self.assertIsNone(data2)
+        self.assertEqual(response3.status_code, 404)
+        self.assertIsNone(data3)
+
+    def test_join_group(self):
+        header = self.headers["test5"]
+        profile_id_search = self.get_profile_ids(header)
+        selected_profile_id = random.choice(profile_id_search[0])
+        selected_non_profile_id = random.choice(profile_id_search[1])
+        group_endpoint = f"/groups/?profile_id={selected_profile_id}"
+
+        groups = []
+        group_search = Helpers.get_request(group_endpoint, header=header)
+        for group in group_search[1]:
+            groups.append(group["groups"]["group_id"])
+
+        non_groups = [i for i in range(1, 11) if i not in groups]
+
+        body1 = {
+            "profile_id": f"{selected_profile_id}"
+        }
+        body2 = {
+            "profile_id": f"{selected_non_profile_id}"
+        }
+
+        endpoint1 = f"/groups/{non_groups[0]}/join"
+        endpoint2 = f"/groups/{groups[0]}/join"
+
+        response, data = Helpers.post_request(
+            endpoint1, header=header, body=body1)
+        response2, data2 = Helpers.post_request(
+            endpoint2, header=header, body=body1)
+        response3, data3 = Helpers.post_request(
+            endpoint1, header=header, body=body2)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["profile_id"], selected_profile_id)
+        self.assertIsInstance(data, dict)
+        self.assertEqual(response2.status_code, 401)
+        self.assertIsNone(data2)
+        self.assertEqual(response3.status_code, 404)
+        self.assertIsNone(data3)
+
+    def test_unjoin_group(self):
+        header = self.headers["test1"]
+        profile_id_search = self.get_profile_ids(header)
+        selected_profile_id = random.choice(profile_id_search[0])
+        selected_non_profile_id = random.choice(profile_id_search[1])
+
+        group_endpoint = f"/groups/?profile_id={selected_profile_id}"
+
+        groups = []
+        group_search = Helpers.get_request(group_endpoint, header=header)
+        for group in group_search[1]:
+            groups.append(group["groups"]["group_id"])
+
+        non_groups = [i for i in range(1, 11) if i not in groups]
+
+        body1 = {
+            "profile_id": f"{selected_profile_id}"
+        }
+        body2 = {
+            "profile_id": f"{selected_non_profile_id}"
+        }
+
+        endpoint1 = f"/groups/{groups[0]}/unjoin"
+        endpoint2 = f"/groups/{non_groups[0]}/unjoin"
+
+        response, data = Helpers.delete_request(
+            endpoint1, header=header, body=body1)
+        response2, data2 = Helpers.delete_request(
+            endpoint2, header=header, body=body1)
+        response3, data3 = Helpers.delete_request(
+            endpoint1, header=header, body=body2)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["profile_id"], selected_profile_id)
+        self.assertEqual(data["group_id"], groups[0])
+        self.assertEqual(response2.status_code, 401)
         self.assertIsNone(data2)
         self.assertEqual(response3.status_code, 404)
         self.assertIsNone(data3)
