@@ -357,3 +357,57 @@ class TestGroups(unittest.TestCase):
         self.assertIsNone(data3)
         self.assertEqual(response4.status_code, 404)
         self.assertIsNone(data4)
+
+    def test_remove_content(self):
+        header = self.headers["test4"]
+        profile_ids, non_profile_ids = self.get_profile_ids(header)
+
+        group_search = GroupMembers.query.filter_by(profile_id=profile_ids[0])
+
+        group_ids = []
+        for group in group_search:
+            group_ids.append(group.groups.group_id)
+
+        non_group_ids = [i for i in range(1, 11)if i not in group_ids]
+
+        group_content_ids = []
+        group_content_search = Group.query.get(group_ids[0])
+        for content in group_content_search.content:
+            group_content_ids.append(content.content_id)
+
+        non_group_content_ids = [i for i in range(
+            1, 31) if i not in group_content_ids]
+
+        endpoint1 = f"/groups/{group_ids[0]}/content?profile_id={profile_ids[0]}"       # noqa: E501
+        endpoint2 = f"/groups/{non_group_ids[0]}/content?profile_id={profile_ids[0]}"   # noqa: E501
+
+        body1 = {
+            "content_id": f"{non_group_content_ids[0]}"
+        }
+        body2 = {
+            "content_id": f"{group_content_ids[0]}"
+        }
+        body3 = {
+            "content_id": "31"
+        }
+
+        response, data = Helpers.delete_request(
+            endpoint1, header=header, body=body1)
+        response2, data2 = Helpers.delete_request(
+            endpoint2, header=header, body=body2)
+        response3, data3 = Helpers.delete_request(
+            endpoint1, header=header, body=body3)
+        response4, data4 = Helpers.delete_request(
+            endpoint1, header=header, body=body2)
+        data4_content = []
+        for content in data4["content"]:
+            data4_content.append(content["content_id"])
+
+        self.assertEqual(response.status_code, 404)
+        self.assertIsNone(data)
+        self.assertEqual(response2.status_code, 401)
+        self.assertIsNone(data2)
+        self.assertEqual(response3.status_code, 404)
+        self.assertIsNone(data3)
+        self.assertEqual(response4.status_code, 200)
+        self.assertTrue(group_content_ids[0] not in data4_content)

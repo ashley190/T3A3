@@ -222,17 +222,20 @@ def add_content(id):
 @groups.route("/<int:id>/content", methods=["DELETE"])
 @jwt_required
 def remove_content(id):
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    profile = retrieve_profile(request.args["profile_id"])
 
-    if not user:
-        return abort(401, description="Invalid user")
-
-    content = content_schema.load(request.json, partial=True)
     group = Group.query.filter_by(group_id=id).first()
 
     if not group:
         return abort(404, description="group not found")
+
+    group_member = GroupMembers.query.filter_by(
+        profile_id=profile.profile_id, group_id=id).first()
+
+    if not group_member:
+        return abort(401, description="Not a member of this group")
+
+    content = content_schema.load(request.json, partial=True)
 
     for item in group.content:
         if item.content_id == content["content_id"]:
