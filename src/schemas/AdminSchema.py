@@ -14,3 +14,12 @@ class AdminSchema(ma.SQLAlchemyAutoSchema):
 
 admin_schema = AdminSchema()
 admins_schema = AdminSchema(many=True)
+
+
+class AdminUserSchema(ma.Schema):
+    email = ma.Email()
+    profile_count = ma.Integer()
+
+
+admin_user_schema = AdminUserSchema()
+admin_users_schema = AdminUserSchema(many=True)

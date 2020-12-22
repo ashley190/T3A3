@@ -37,3 +37,5 @@ Password hash not returned during schema serialisation
 Use token authentication (expiry 1 day)
 Token generation process using JWT where secret key is stored and retrieved from environment variables during production(diff from development key)
 User authorisation implemented to perform CRUD actions on user owned profiles only
+Separate logins to admin interface (separate endpoints)
+Require business end to manage admin accounts - account creation, deletion and further segregation of responsibilities within admin accounts if possible considering security factors.
