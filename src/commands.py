@@ -34,7 +34,7 @@ def seed_db():
     contents = []
     profile_ids = list(range(1, 11))
     random.shuffle(profile_ids)
-    admin = []
+    admins = []
 
     for i in range(1, 6):
         user = User()
@@ -102,7 +102,7 @@ def seed_db():
         admin.password = bcrypt.generate_password_hash(
             "654321").decode("utf-8")
         db.session.add(admin)
-        admin.append(admin)
+        admins.append(admin)
 
     db.session.commit()
     print("Admin table seeded")
