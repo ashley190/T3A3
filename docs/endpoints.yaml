@@ -11,6 +11,8 @@ tags:
   description: "Group functions"
 - name: "content"
   description: "Content related functions"
+- name: "admin"
+  description: "Admin related functions"
 paths:
   /users/register:
     post:
@@ -553,41 +555,98 @@ paths:
           description: "Invalid user"
         "422":
           description: "Invalid token"
-  #   put:
-  #     tags:
-  #       - "content"
-  #     summary: "Create content"
-  #     parameters:
-  #     - in: "body"
-  #       name: "body"
-  #       description: "Create new content"
-  #       schema:
-  #         type: "object"
-  #         properties:
-  #           title:
-  #             type: "string"
-  #           genre:
-  #             type: "string"
-  #           year:
-  #             type: "integer"
-  #     responses:
-  #       "200":
-  #         description: "successful operation"
-  #       "400":
-  #         description: "Invalid input"
-  # /content/{content_id}:
-  #   delete:
-  #     tags:
-  #     - "content"
-  #     summary: "remove content"
-  #     parameters:
-  #     - name: "content_id"
-  #       in: "path"
-  #       description: "id of content to be removed"
-  #       required: true
-  #       type: "integer"
-  #     responses:
-  #       "200":
-  #         description: "successful operation"
-  #       "404":
-  #         description: "content not found"
+  /admin/login:
+    post:
+      tags:
+      - "admin"
+      summary: "Logs admin into admin interface"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Admin log in"
+        schema:
+          type: "object"
+          properties:
+            username:
+              type: "string"
+            password:
+              type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "incorrect login credentials"
+  /admin/users:
+    get:
+      tags:
+      - "admin"
+      summary: "Display user data summary"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Invalid user"
+        "422":
+          description: "Invalid token"
+  /admin/groups:
+    get:
+      tags:
+      - "admin"
+      summary: "Display group data summary"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Invalid user"
+        "422":
+          description: "Invalid token"
+  /admin/content:
+    get:
+      tags:
+      - "admin"
+      summary: "Display content data summary"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Invalid user"
+        "422":
+          description: "Invalid token"
+    put:
+      tags:
+        - "admin"
+      summary: "Create content"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create new content"
+        schema:
+          type: "object"
+          properties:
+            title:
+              type: "string"
+            genre:
+              type: "string"
+            year:
+              type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid input"
+  /content/{content_id}:
+    delete:
+      tags:
+      - "admin"
+      summary: "remove content"
+      parameters:
+      - name: "content_id"
+        in: "path"
+        description: "id of content to be removed"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "404":
+          description: "content not found"
