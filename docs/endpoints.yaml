@@ -549,43 +549,45 @@ paths:
       responses:
         "200":
           description: "successful operation"
-        "404":
-          description: "not found"
-    put:
-      tags:
-        - "content"
-      summary: "Create content"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Create new content"
-        schema:
-          type: "object"
-          properties:
-            title:
-              type: "string"
-            genre:
-              type: "string"
-            year:
-              type: "integer"
-      responses:
-        "200":
-          description: "successful operation"
-        "400":
-          description: "Invalid input"
-  /content/{content_id}:
-    delete:
-      tags:
-      - "content"
-      summary: "remove content"
-      parameters:
-      - name: "content_id"
-        in: "path"
-        description: "id of content to be removed"
-        required: true
-        type: "integer"
-      responses:
-        "200":
-          description: "successful operation"
-        "404":
-          description: "content not found"
+        "401":
+          description: "Invalid user"
+        "422":
+          description: "Invalid token"
+  #   put:
+  #     tags:
+  #       - "content"
+  #     summary: "Create content"
+  #     parameters:
+  #     - in: "body"
+  #       name: "body"
+  #       description: "Create new content"
+  #       schema:
+  #         type: "object"
+  #         properties:
+  #           title:
+  #             type: "string"
+  #           genre:
+  #             type: "string"
+  #           year:
+  #             type: "integer"
+  #     responses:
+  #       "200":
+  #         description: "successful operation"
+  #       "400":
+  #         description: "Invalid input"
+  # /content/{content_id}:
+  #   delete:
+  #     tags:
+  #     - "content"
+  #     summary: "remove content"
+  #     parameters:
+  #     - name: "content_id"
+  #       in: "path"
+  #       description: "id of content to be removed"
+  #       required: true
+  #       type: "integer"
+  #     responses:
+  #       "200":
+  #         description: "successful operation"
+  #       "404":
+  #         description: "content not found"
