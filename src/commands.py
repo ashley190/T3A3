@@ -24,6 +24,7 @@ def seed_db():
     from models.Group import Group
     from models.Content import Content
     from models.Group_members import GroupMembers
+    from models.Admin import Admin
     from main import bcrypt
     import random
     from faker import Faker
@@ -33,6 +34,7 @@ def seed_db():
     contents = []
     profile_ids = list(range(1, 11))
     random.shuffle(profile_ids)
+    admin = []
 
     for i in range(1, 6):
         user = User()
@@ -93,3 +95,14 @@ def seed_db():
 
     db.session.commit()
     print("Group table seeded")
+
+    for i in range(1, 3):
+        admin = Admin()
+        admin.username = f"Admin{i}"
+        admin.password = bcrypt.generate_password_hash(
+            "654321").decode("utf-8")
+        db.session.add(admin)
+        admin.append(admin)
+
+    db.session.commit()
+    print("Admin table seeded")
