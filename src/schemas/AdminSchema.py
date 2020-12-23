@@ -23,3 +23,30 @@ class AdminUserSchema(ma.Schema):
 
 admin_user_schema = AdminUserSchema()
 admin_users_schema = AdminUserSchema(many=True)
+
+
+class AdminGroupSchema(ma.Schema):
+    group_id = ma.Integer()
+    members = ma.Integer()
+
+
+admin_group_schema = AdminGroupSchema()
+admin_groups_schema = AdminGroupSchema(many=True)
+
+
+class AdminContentSchema(ma.Schema):
+    content_id = ma.Integer()
+    unrecommended = ma.Integer()
+
+
+admin_content_schema = AdminContentSchema()
+admin_contents_schema = AdminContentSchema(many=True)
+
+
+class AdminGroupContentSchema(ma.Schema):
+    content_id = ma.Integer()
+    group_count = ma.Integer()
+
+
+admin_groupcontent_schema = AdminGroupContentSchema()
+admin_groupcontents_schema = AdminGroupContentSchema(many=True)
