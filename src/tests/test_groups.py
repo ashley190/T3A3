@@ -262,7 +262,8 @@ class TestGroups(unittest.TestCase):
         non_group_ids = [i for i in range(1, 11) if i != group_id]
 
         group_members_search = GroupMembers.query.filter_by(
-            group_id=group_id, admin=False)
+            group_id=group_id)
+
         member_ids = []
 
         for group in group_members_search:
