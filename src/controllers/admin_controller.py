@@ -187,3 +187,13 @@ def delete_content(id):
     db.session.commit()
 
     return jsonify(content_schema.dump(content))
+
+# @admin.route("/backupdb", methods=["GET"])
+# @jwt_required
+# def download_all_data(():
+#     admin_id = get_jwt_identity()
+
+#     admin = Admin.query.get(admin_id)
+
+#     if not admin:
+#         return abort(401, description="Invalid admin user")
