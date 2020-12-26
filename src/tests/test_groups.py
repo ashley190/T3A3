@@ -114,6 +114,11 @@ class TestGroups(unittest.TestCase):
         header = self.headers["test3"]
         profile_ids = Helpers.get_profile_id(header)
 
+        while len(profile_ids) == 0:
+            self.tearDown()
+            self.setUp()
+            profile_ids = Helpers.get_profile_id(header)
+
         groups = Helpers.get_request(
             f"/groups/?profile_id={profile_ids[0]}", header=header)
         group_ids = []
@@ -262,7 +267,7 @@ class TestGroups(unittest.TestCase):
         non_group_ids = [i for i in range(1, 11) if i != group_id]
 
         group_members_search = GroupMembers.query.filter_by(
-            group_id=group_id)
+            group_id=group_id, admin=False)
 
         member_ids = []
 

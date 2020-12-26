@@ -5,3 +5,4 @@ __pycache__
 :testdb:
 :testdb:-journal
 .DS_Store
+backup

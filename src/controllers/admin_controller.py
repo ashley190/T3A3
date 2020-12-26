@@ -14,6 +14,9 @@ from datetime import timedelta
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
 from flask import Blueprint, request, jsonify, abort
 from sqlalchemy import func
+import sys
+import os
+from datetime import datetime
 
 admin = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -188,12 +191,74 @@ def delete_content(id):
 
     return jsonify(content_schema.dump(content))
 
-# @admin.route("/backupdb", methods=["GET"])
-# @jwt_required
-# def download_all_data(():
-#     admin_id = get_jwt_identity()
 
-#     admin = Admin.query.get(admin_id)
+@admin.route("/backupdb", methods=["GET"])
+@jwt_required
+def download_all_data():
+    admin_id = get_jwt_identity()
 
-#     if not admin:
-#         return abort(401, description="Invalid admin user")
+    admin = Admin.query.get(admin_id)
+
+    if not admin:
+        return abort(401, description="Invalid admin user")
+
+    cursor = db.session.connection().connection.cursor()
+    cursor.execute(
+        """SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema='public'""")
+    table_names = cursor.fetchall()
+    names = []
+    for name in table_names:
+        names.append(*name)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d;%H%:%M:%S")
+    path = f"backup/{timestamp}"
+    for name in names:
+        filename = f"{path}/{name}.csv"
+        if not os.path.exists(os.path.dirname(filename)):
+            try:
+                os.makedirs(os.path.dirname(filename))
+            except OSError:
+                raise "Can't create path"
+
+        with open(filename, 'w') as sys.stdout:
+            cursor.copy_to(sys.stdout, f"{name}", sep=',')
+
+    return "data exported"
+
+
+@admin.route("/backups", methods=["GET"])
+@jwt_required
+def list_backup():
+    backups = sorted(os.listdir("backup"))
+
+    return {"backups": f"{backups}"}
+
+
+@admin.route("/backups/<name>", methods=["POST"])
+@jwt_required
+def restore_backup(name):
+    admin_id = get_jwt_identity()
+
+    admin = Admin.query.get(admin_id)
+
+    if not admin:
+        return abort(401, description="Invalid admin user")
+
+    latest_backup_path = f"backup/{name}"
+
+    tables = [
+        "users", "profiles", "groups", "content",
+        "group_content", "group_members", "unrecommend"]
+
+    for table in tables:
+        cursor = db.session.connection().connection.cursor()
+        cursor.execute(f"TRUNCATE TABLE {table} CASCADE")
+        path = f"{latest_backup_path}/{table}.csv"
+
+        with open(path, "r") as file:
+            cursor.copy_from(file, table, sep=",")
+            db.session.commit()
+
+    return f"tables restored from {latest_backup_path}"
