@@ -6,6 +6,11 @@
 <h5>Email:                  {{ user.email }}</h5>
 <h5>Subscription Status: {{ subscription }}</h5>
 <button><a href="{{ url_for('web_users.update_user') }}">Update details</a></button>
+<!-- <button><a href="{{ url_for('users.delete_user') }} action='delete'">Delete account</a></button> -->
+<button><form method="POST" action="/web/account/delete">
+    {{ form.csrf_token }}
+    {{ form.submit }}
+</form></button>
 
 
 {% for message in get_flashed_messages() %}

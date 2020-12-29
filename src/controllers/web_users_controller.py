@@ -1,8 +1,9 @@
 from models.User import User
+from models.Profile import Profile
 from main import db, login_manager
 from schemas.UserSchema import user_schema
 from flask import Blueprint, render_template, flash, redirect, url_for, abort
-from forms import RegistrationForm, LoginForm, UpdateUserForm
+from forms import RegistrationForm, LoginForm, UpdateUserForm, DeleteButton
 from flask_login import current_user, login_required, logout_user, login_user
 
 
@@ -38,7 +39,6 @@ def web_users_register():
             login_user(new_user)
             return "Registration successful. Redirect to home page"
         flash("Email already registered")
-
     return render_template("user_register.html", form=form)
 
 
@@ -75,14 +75,11 @@ def get_user():
     if user.subscription_status:
         subscription_status = "Active"
 
-    if not user:
-        return abort(404, description="User not found")
-
-    # form = DeleteButton()
+    form = DeleteButton()
     return render_template(
         "account_details.html",
         user=user,
-        subscription=subscription_status)     # form=form
+        subscription=subscription_status, form=form)
 
 
 @web_users.route("/account/update", methods=["GET", "POST"])
@@ -90,9 +87,6 @@ def get_user():
 def update_user():
     user_id = current_user.get_id()
     user = User.query.filter_by(user_id=user_id)
-
-    if not user:
-        return abort(401, description="Invalid user")
 
     form = UpdateUserForm(obj=user.first())
     if form.validate_on_submit():
@@ -110,3 +104,25 @@ def update_user():
             flash("Account updated!")
             return redirect(url_for("web_users.get_user"))
     return render_template("user_update.html", form=form, user=user)
+
+
+@web_users.route("/account/delete", methods=["POST"])
+@login_required
+def delete_user():
+    form = DeleteButton()
+    if form.submit.data:
+        user_id = current_user.get_id()
+        user = User.query.get(user_id)
+
+        profiles = Profile.query.filter_by(user_id=user.user_id)
+        for profile in profiles:
+            while len(profile.unrecommend) > 0:
+                for item in profile.unrecommend:
+                    profile.unrecommend.remove(item)
+                db.session.commit()
+
+        db.session.delete(user)
+        db.session.commit()
+        logout_user()
+        flash("Account deleted")
+        return redirect(url_for("web_users.web_users_login"))
