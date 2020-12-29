@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ name }}</h1>
+
+<h2>Content</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Year</th>
+                <th>Unrecommend</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for content in contents %}
+            <tr>
+                <td>{{ content.title }}</td>
+                <td>{{ content.genre }}</td>
+                <td>{{ content.year }}</td>
+                <td><a href="#">unrecommend</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+{% endblock %}

@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from controllers.web_users_controller import load_user
 from models.Profile import Profile
 from models.Group_members import GroupMembers
+from models.Content import Content
 from schemas.ProfileSchema import profile_schema
 from forms import CreateProfile, UpdateProfile, DeleteButton
 from main import db
@@ -18,7 +19,7 @@ def show_profiles():
         user_id=user.user_id).order_by(Profile.profile_id)
 
     form = DeleteButton()
-    return render_template("welcome.html", profiles=profiles, form=form)
+    return render_template("profiles.html", profiles=profiles, form=form)
 
 
 @web_profiles.route("/create", methods=["GET", "POST"])
@@ -40,7 +41,7 @@ def create_profile():
     return render_template("create_profile.html", form=form)
 
 
-@web_profiles.route("/<int:id>", methods=["GET", "POST"])
+@web_profiles.route("/<int:id>/update", methods=["GET", "POST"])
 @login_required
 def update_profile(id):
     user = load_user(current_user.get_id())
@@ -93,3 +94,21 @@ def delete_profile(id):
 
         flash("Profile deleted")
         return redirect(url_for("web_profiles.show_profiles"))
+
+
+@web_profiles.route("/<int:id>/view", methods=["GET"])
+@login_required
+def view_profile(id):
+    user = load_user(current_user.get_id())
+
+    profile = Profile.query.filter_by(
+        profile_id=id, user_id=user.user_id).first()
+
+    if not profile:
+        flash("Profile not found")
+        return redirect(url_for("web_profiles.view_profile"))
+
+    contents = Content.query.all()
+
+    return render_template(
+        "view_profile.html", contents=contents, name=profile.name)
