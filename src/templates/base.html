@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>T3A3</title>
+    </head>
+    <body>
+        <h1>T3A3 - Netflix extension</h1>
+        {% if current_user.is_authenticated %}
+            {% include 'navbar.html' %}
+        {% endif %}
+        {% block content %}
+        
+        {% endblock %}
+    </body>
+</html>
