@@ -2,8 +2,16 @@
 
 {% block content %}
 <div class="formwrapper">
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
     <h3>User Registration</h3>
-    <form method="POST" action="web/register">
+    <form method="POST" action="/web/register">
         {{ form.csrf_token }}
         <div class="form-field">
             {{ form.email.label }}

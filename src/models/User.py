@@ -19,5 +19,11 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
+    def get_id(self):
+        try:
+            return str(self.user_id)
+        except AttributeError:
+            raise NotImplementedError('No `id` attribute - override `get_id`')
+
     def __repr__(self):
         return f"<User {self.email}>"
