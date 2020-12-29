@@ -1,0 +1,95 @@
+from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
+from controllers.web_users_controller import load_user
+from models.Profile import Profile
+from models.Group_members import GroupMembers
+from schemas.ProfileSchema import profile_schema
+from forms import CreateProfile, UpdateProfile, DeleteButton
+from main import db
+
+web_profiles = Blueprint("web_profiles", __name__, url_prefix="/web/profiles")
+
+
+@web_profiles.route("/", methods=["GET"])
+@login_required
+def show_profiles():
+    user = load_user(current_user.get_id())
+    profiles = Profile.query.filter_by(
+        user_id=user.user_id).order_by(Profile.profile_id)
+
+    form = DeleteButton()
+    return render_template("welcome.html", profiles=profiles, form=form)
+
+
+@web_profiles.route("/create", methods=["GET", "POST"])
+@login_required
+def create_profile():
+    user = load_user(current_user.get_id())
+
+    form = CreateProfile()
+    if form.validate_on_submit():
+        new_profile = Profile(
+            name=form.name.data,
+            restrictions=form.restriction.data
+        )
+        user.profiles.append(new_profile)
+        db.session.commit()
+        flash("Profile added!")
+        return redirect(url_for("web_profiles.show_profiles"))
+
+    return render_template("create_profile.html", form=form)
+
+
+@web_profiles.route("/<int:id>", methods=["GET", "POST"])
+@login_required
+def update_profile(id):
+    user = load_user(current_user.get_id())
+    profile = Profile.query.filter_by(profile_id=id, user_id=user.user_id)
+
+    if profile.count() != 1:
+        flash("Can't find profile")
+        return redirect(url_for("web_profiles.show_profiles"))
+
+    form = UpdateProfile(obj=profile.first())
+    if form.validate_on_submit():
+        data = {
+            "name": form.name.data,
+            "restrictions": form.restriction.data
+        }
+        fields = profile_schema.load(data, partial=True)
+        profile.update(fields)
+        db.session.commit()
+        flash("Profile updated!")
+        return redirect(url_for("web_profiles.show_profiles"))
+
+    return render_template("update_profile.html", form=form, id=id)
+
+
+@web_profiles.route("/<int:id>/delete", methods=["POST"])
+@login_required
+def delete_profile(id):
+    form = DeleteButton()
+    if form.submit.data:
+        user = load_user(current_user.get_id())
+        profile = Profile.query.filter_by(
+            profile_id=id, user_id=user.user_id).first()
+
+        if not profile:
+            flash("No profile found")
+            return redirect(url_for("web_profiles.show_profiles"))
+
+        while len(profile.unrecommend) > 0:
+            for item in profile.unrecommend:
+                profile.unrecommend.remove(item)
+            db.session.commit()
+
+        groups = GroupMembers.query.filter_by(profile_id=profile.profile_id)
+        for group in groups:
+            db.session.delete(group)
+            db.session.commit()
+
+        db.session.delete(profile)
+        db.session.commit()
+
+        flash("Profile deleted")
+        return redirect(url_for("web_profiles.show_profiles"))

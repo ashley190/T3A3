@@ -1,7 +1,7 @@
 <nav>
-    <a href="#">Home</a>
+    <a href="{{ url_for('web_profiles.show_profiles') }}">Home</a>
     <a href="{{ url_for('web_users.get_user') }}">Account Info</a>
-    <a href="#">Profiles</a>
+    <a href="{{ url_for('web_profiles.show_profiles') }}">Profiles</a>
     <a href="#">Groups</a>
     <a href="{{ url_for('web_users.logout') }}">Logout</a>
 </nav>

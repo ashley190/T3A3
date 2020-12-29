@@ -2,7 +2,8 @@ from models.User import User
 from models.Profile import Profile
 from main import db, login_manager
 from schemas.UserSchema import user_schema
-from flask import Blueprint, render_template, flash, redirect, url_for, abort
+from flask import (
+    Blueprint, render_template, flash, redirect, url_for, abort, request)
 from forms import RegistrationForm, LoginForm, UpdateUserForm, DeleteButton
 from flask_login import current_user, login_required, logout_user, login_user
 
@@ -37,7 +38,7 @@ def web_users_register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            return "Registration successful. Redirect to home page"
+            return redirect(url_for("web_profiles.show_profiles"))
         flash("Email already registered")
     return render_template("user_register.html", form=form)
 
@@ -45,15 +46,15 @@ def web_users_register():
 @web_users.route("/login", methods=["GET", "POST"])
 def web_users_login():
     if current_user.is_authenticated:
-        return "Redirect to main page"
+        return redirect(url_for("web_profiles.show_profiles"))
 
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            # next_page = request.args.get('next')
-            # return redirect(next_page or "Main page")
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for("web_profiles.show_profiles"))
             return "Login successful"
         flash("Invalid username and password")
         return redirect(url_for("web_users.web_users_login"))

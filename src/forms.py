@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SubmitField, PasswordField
+from wtforms import (
+    StringField, BooleanField, SubmitField, PasswordField, SelectField)
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -27,4 +28,19 @@ class UpdateUserForm(FlaskForm):
 
 
 class DeleteButton(FlaskForm):
-    submit = SubmitField("Delete Account")
+    submit = SubmitField("Delete")
+
+
+class CreateProfile(FlaskForm):
+    name = StringField("name", validators=[DataRequired(), Length(min=1)])
+    restriction = SelectField(
+        "Restrictions",
+        choices=[
+            ("G", "G"), ("PG", "PG"), ("M", "M"),
+            ("MA15+", "MA15+"), ("R18+", "R18+")],
+        validators=[DataRequired()])
+    submit = SubmitField("Create Profile")
+
+
+class UpdateProfile(CreateProfile):
+    submit = SubmitField("Update Profile")

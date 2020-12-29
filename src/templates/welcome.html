@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome</h1>
+
+{% for profile in profiles %}
+    <h3>{{ profile.name }}</h3>
+    <a href="{{ url_for('web_profiles.update_profile', id=profile.profile_id) }}">update</a>
+    <button>
+        <form method="POST" action="{{ url_for('web_profiles.delete_profile', id=profile.profile_id) }}">
+            {{ form.csrf_token }}
+            {{ form.submit }}
+        </form>
+    </button> 
+{% endfor %}
+
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
+{% endblock %}

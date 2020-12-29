@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="formwrapper">
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <h3>Create Profile</h3>
+    <form method="POST" action="/web/profiles/create">
+        {{ form.csrf_token }}
+        <div class="form-field">
+            {{ form.name.label }}
+            {{ form.name }}
+            {% if form.name.errors %}
+            <ul class="errors">
+                {% for error in form.name.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.restriction.label }}
+            {{ form.restriction }}
+            {% if form.restriction.errors %}
+            <ul class="errors">
+                {% for error in form.restriction.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.submit }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}
