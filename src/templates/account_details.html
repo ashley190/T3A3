@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Account Info</h1>
+
+<h5>Email:                  {{ user.email }}</h5>
+<h5>Subscription Status: {{ subscription }}</h5>
+<button><a href="{{ url_for('web_users.update_user') }}">Update details</a></button>
+
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
+{% endblock %}
