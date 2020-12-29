@@ -1,4 +1,4 @@
-from main import db
+from main import db, bcrypt
 
 
 class User(db.Model):
@@ -11,6 +11,12 @@ class User(db.Model):
     profiles = db.relationship(
         "Profile", backref="user", lazy="dynamic",
         cascade="all, delete, delete-orphan")
+
+    def set_password(self, password):
+        self.password = bcrypt.generate_password_hash(password).decode("utf-8")
+    
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
     def __repr__(self):
         return f"<User {self.email}>"

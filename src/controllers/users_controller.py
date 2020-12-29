@@ -1,8 +1,9 @@
 from models.User import User
 from models.Profile import Profile
 from schemas.UserSchema import user_schema
-from main import db, bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity      # noqa: E501
+from main import db
+from flask_jwt_extended import (
+    create_access_token, jwt_required, get_jwt_identity)
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, abort
 
@@ -20,8 +21,7 @@ def users_register():
 
     user = User()
     user.email = user_fields["email"]
-    user.password = bcrypt.generate_password_hash(
-        user_fields["password"]).decode("utf-8")
+    user.set_password(user_fields["password"])
     user.subscription_status = user_fields["subscription_status"]
 
     db.session.add(user)
@@ -36,8 +36,7 @@ def users_login():
 
     user = User.query.filter_by(email=user_fields["email"]).first()
 
-    if not user or not bcrypt.check_password_hash(
-            user.password, user_fields["password"]):
+    if not user or not user.check_password(user_fields["password"]):
         return abort(401, description="Incorrect email and password")
 
     expiry = timedelta(days=1)

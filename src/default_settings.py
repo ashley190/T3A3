@@ -14,6 +14,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = "Netflix"
+    SECRET_KEY = "Authkey"
 
     @property
     def SQLALCHEMY_DATABASE_URI(self):
@@ -25,13 +26,19 @@ class DevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
+    @property
     def JWT_SECRET_KEY(self):
         return get_from_env("JWT_SECRET_KEY")
+
+    @property
+    def SECRET_KEY(self):
+        return get_from_env("SECRET KEY")
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:testdb:"
+    WTF_CSRF_ENABLED = False
 
 
 environment = os.environ.get("FLASK_ENV")
