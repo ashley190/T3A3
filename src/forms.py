@@ -52,3 +52,9 @@ class UnrecommendButton(FlaskForm):
 
 class RemoveButton(FlaskForm):
     submit = SubmitField("Remove")
+
+
+class CreateGroup(FlaskForm):
+    name = StringField("name", validators=[DataRequired(), Length(min=1)])
+    description = StringField("description")
+    submit = SubmitField("Create Group")

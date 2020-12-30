@@ -1,7 +1,8 @@
 <nav>
-    <a href="{{ url_for('web_profiles.show_profiles') }}">Home</a>
     <a href="{{ url_for('web_users.get_user') }}">Account Info</a>
     <a href="{{ url_for('web_profiles.show_profiles') }}">Profiles</a>
-    <a href="#">Groups</a>
+    {% if "web/profiles" in request.url and request.url[-1].isdigit() %}
+        <a href="{{ url_for('web_groups.show_groups', profile_id=profile.profile_id) }}">Groups</a>
+    {% endif %}
     <a href="{{ url_for('web_users.logout') }}">Logout</a>
 </nav>

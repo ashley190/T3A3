@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Groups</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Group ID</th>
+            <th>Group Name</th>
+            <th>Description</th>
+            <th colspan="2">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.groups.group_id}}</td>
+            <td>{{ group.groups.name }}</td>
+            <td>{{ group.groups.description }}</td>
+            {% if group.admin %}
+                <td>edit</td>
+                <td>delete</td>
+            {% else %}
+                <td colspan="2">unjoin</td>
+            {% endif %}
+        {% endfor %}
+        </tr>
+    </tbody>
+</table>
+
+<h2>Other Groups</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Group ID</th>
+            <th>Group Name</th>
+            <th>Description</th>
+            <th>Join</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in other_groups %}
+            {% if group.group_id not in member_group_ids %}
+        <tr>
+            <td>{{ group.group_id }}</td>
+            <td>{{ group.name }}</td>
+            <td>{{ group.description }}</td>
+            <td>Join</td>
+        </tr>
+    </tbody>
+            {% endif %}
+        {% endfor %}
+</table>
+
+<a href="{{ url_for('web_groups.create_group', profile_id=profile.profile_id) }}">Create group</a>
+{% endblock %}

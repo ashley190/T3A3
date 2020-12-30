@@ -108,7 +108,8 @@ def view_profile(id):
 
     if not profile:
         flash("Profile not found")
-        return redirect(url_for("web_profiles.view_profile"))
+        return redirect(
+            url_for("web_profiles.view_profile", id=profile.profile_id))
 
     contents = Content.query.all()
 

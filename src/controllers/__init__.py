@@ -5,7 +5,7 @@ from controllers.contents_controller import content
 from controllers.admin_controller import admin
 from controllers.web_users_controller import web_users
 from controllers.web_profiles_controller import web_profiles
-
+from controllers.web_groups_controller import web_groups
 
 registerable_controllers = [
     users,
@@ -14,5 +14,6 @@ registerable_controllers = [
     content,
     admin,
     web_users,
-    web_profiles
+    web_profiles,
+    web_groups
 ]
