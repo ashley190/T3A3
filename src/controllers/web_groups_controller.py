@@ -1,11 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 from models.Profile import Profile
 from models.Group import Group
 from models.Group_members import GroupMembers
-from schemas.GroupMemberSchema import group_members_schema
-from schemas.ProfileSchema import profiles_schema
-from schemas.GroupSchema import group_schema
 from main import db
 from forms import CreateGroup
 
@@ -46,5 +43,3 @@ def create_group():
         return redirect(
             url_for("web_groups.show_groups", profile_id=profile.profile_id))
     return render_template("create_group.html", form=form, profile=profile)
-
-
