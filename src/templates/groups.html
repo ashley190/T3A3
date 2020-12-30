@@ -28,7 +28,14 @@
             <td><a href="#">View</a></td>
             {% if group.admin %}
                 <td><a href="{{ url_for('web_groups.update_group', id=group.groups.group_id, profile_id=profile.profile_id)}}">edit</a></td>
-                <td>delete</td>
+                <td>
+                    <button>
+                        <form method="POST" action="{{ url_for('web_groups.delete_group', id=group.groups.group_id, profile_id=profile.profile_id) }}">
+                            {{ form.csrf_token }}
+                            {{ form.submit }}
+                        </form>
+                    </button>
+                </td>
             {% else %}
                 <td colspan="2">unjoin</td>
             {% endif %}

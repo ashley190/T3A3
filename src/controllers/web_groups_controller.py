@@ -5,7 +5,7 @@ from models.Group import Group
 from models.Group_members import GroupMembers
 from schemas.GroupSchema import group_schema
 from main import db
-from forms import CreateGroup, UpdateGroup
+from forms import CreateGroup, UpdateGroup, DeleteButton
 
 web_groups = Blueprint("web_groups", __name__, url_prefix="/web/groups")
 
@@ -19,9 +19,10 @@ def show_groups():
     other_groups = Group.query.all()
 
     member_group_ids = [group.groups.group_id for group in groups]
+    form = DeleteButton()
     return render_template(
         "groups.html", groups=groups, other_groups=other_groups,
-        member_group_ids=member_group_ids, profile=profile)
+        member_group_ids=member_group_ids, profile=profile, form=form)
 
 
 @web_groups.route("/create", methods=["GET", "POST"])
@@ -71,3 +72,35 @@ def update_group(id):
             return redirect(url_for(
                 "web_groups.show_groups", profile_id=profile_id))
         return render_template("update_group.html", id=id, form=form)
+
+
+@web_groups.route("<int:id>/delete", methods=["POST"])
+@login_required
+def delete_group(id):
+    profile_id = request.args["profile_id"]
+    member = GroupMembers.query.filter_by(
+        profile_id=profile_id, group_id=id).first()
+    group = Group.query.filter_by(group_id=id).first()
+    members = GroupMembers.query.filter_by(group_id=id, admin=False).all()
+    if not member.admin:
+        flash("Unauthorised to delete group")
+        return render_template(url_for(
+            "web_groups.show_groups", profile_id=profile_id))
+    elif member.admin:
+        form = DeleteButton()
+        if form.submit.data:
+            while len(group.content) > 0:
+                for content in group.content:
+                    group.content.remove(content)
+                db.session.commit()
+
+            for profile in members:
+                db.session.delete(profile)
+            db.session.commit()
+
+            db.session.delete(member)
+            db.session.delete(group)
+            db.session.commit()
+            flash(f"Group {group.group_id} deleted!")
+        return redirect(url_for(
+            "web_groups.show_groups", profile_id=profile_id))
