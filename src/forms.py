@@ -58,3 +58,7 @@ class CreateGroup(FlaskForm):
     name = StringField("name", validators=[DataRequired(), Length(min=1)])
     description = StringField("description")
     submit = SubmitField("Create Group")
+
+
+class UpdateGroup(CreateGroup):
+    submit = SubmitField("Update Group")

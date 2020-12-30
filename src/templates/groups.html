@@ -2,6 +2,14 @@
 
 {% block content %}
 <h1>My Groups</h1>
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
 <table>
     <thead>
         <tr>
@@ -17,9 +25,9 @@
             <td>{{ group.groups.group_id}}</td>
             <td>{{ group.groups.name }}</td>
             <td>{{ group.groups.description }}</td>
-            <td><a href="{{ url_for('web_groups.get_group_by_id', id=group.groups.group_id, profile_id=profile.profile_id)}}">View</a></td>
+            <td><a href="#">View</a></td>
             {% if group.admin %}
-                <td>edit</td>
+                <td><a href="{{ url_for('web_groups.update_group', id=group.groups.group_id, profile_id=profile.profile_id)}}">edit</a></td>
                 <td>delete</td>
             {% else %}
                 <td colspan="2">unjoin</td>
