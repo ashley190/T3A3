@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import current_user, login_required
 from controllers.web_users_controller import load_user
 from models.Profile import Profile
 from models.Group_members import GroupMembers
 from models.Content import Content
 from schemas.ProfileSchema import profile_schema
-from forms import CreateProfile, UpdateProfile, DeleteButton
+from forms import CreateProfile, UpdateProfile, DeleteButton, UnrecommendButton, RemoveButton
 from main import db
 
 web_profiles = Blueprint("web_profiles", __name__, url_prefix="/web/profiles")
@@ -96,7 +96,7 @@ def delete_profile(id):
         return redirect(url_for("web_profiles.show_profiles"))
 
 
-@web_profiles.route("/<int:id>/view", methods=["GET"])
+@web_profiles.route("/<int:id>", methods=["GET"])
 @login_required
 def view_profile(id):
     user = load_user(current_user.get_id())
@@ -110,5 +110,38 @@ def view_profile(id):
 
     contents = Content.query.all()
 
+    form1 = UnrecommendButton()
+    form2 = RemoveButton()
+
     return render_template(
-        "view_profile.html", contents=contents, name=profile.name)
+        "view_profile.html", contents=contents, profile=profile, form1=form1, form2=form2)
+
+
+@web_profiles.route("/<int:id>/<int:content_id>/unrecommend", methods=["POST"])
+@login_required
+def unrecommend_content(id, content_id):
+    form = UnrecommendButton()
+    if form.submit.data:
+        profile = Profile.query.filter_by(profile_id=id).first()
+
+        content = Content.query.filter_by(content_id=content_id).first()
+
+        profile.unrecommend.append(content)
+        db.session.commit()
+
+        return redirect(url_for("web_profiles.view_profile", id=profile.profile_id))
+
+
+@web_profiles.route("/<int:id>/<int:content_id>/restore", methods=["POST"])
+@login_required
+def restore_content(id, content_id):
+    form = RemoveButton()
+    if form.submit.data:
+        profile = Profile.query.filter_by(profile_id=id).first()
+        content = Content.query.filter_by(content_id=content_id).first()
+
+        for item in profile.unrecommend:
+            if item.content_id == content.content_id:
+                profile.unrecommend.remove(item)
+                db.session.commit()
+        return redirect(url_for("web_profiles.view_profile", id=profile.profile_id))

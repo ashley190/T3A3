@@ -4,7 +4,7 @@
 <h1>Profiles</h1>
 
 {% for profile in profiles %}
-    <h3>{{ profile.name }}</h3>
+    <a href="{{ url_for('web_profiles.view_profile', id=profile.profile_id)}}">{{ profile.name }}</a>
     <a href="{{ url_for('web_profiles.update_profile', id=profile.profile_id) }}">update</a>
     <button>
         <form method="POST" action="{{ url_for('web_profiles.delete_profile', id=profile.profile_id) }}">
@@ -14,6 +14,7 @@
     </button> 
 {% endfor %}
 
+<a href="{{ url_for('web_profiles.create_profile') }}">Create New Profile</a>
 
 {% for message in get_flashed_messages() %}
 <div class="alert">

@@ -44,3 +44,11 @@ class CreateProfile(FlaskForm):
 
 class UpdateProfile(CreateProfile):
     submit = SubmitField("Update Profile")
+
+
+class UnrecommendButton(FlaskForm):
+    submit = SubmitField("Unrecommend")
+
+
+class RemoveButton(FlaskForm):
+    submit = SubmitField("Remove")

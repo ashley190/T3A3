@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ name }}</h1>
+<h1>{{ profile.name }}</h1>
 
 <h2>Content</h2>
     <table>
@@ -15,16 +15,54 @@
         </thead>
         <tbody>
             {% for content in contents %}
+                {% if content not in profile.unrecommend %}
             <tr>
                 <td>{{ content.title }}</td>
                 <td>{{ content.genre }}</td>
                 <td>{{ content.year }}</td>
-                <td><a href="#">unrecommend</a></td>
+                <td>
+                    <button>
+                        <form method="POST" action="{{ url_for('web_profiles.unrecommend_content', id=profile.profile_id, content_id=content.content_id )}}">
+                            {{ form1.csrf_token}}
+                            {{ form1.submit }}
+                        </form>
+                    </button>
+                </td>
             </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
 
+{% if profile.unrecommend %}
+<h2>Unrecommend</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for content in profile.unrecommend %}
+            <tr>
+                <td>{{ content.title }}</td>
+                <td>{{ content.genre }}</td>
+                <td>{{ content.year }}</td>
+                <td>
+                    <button>
+                        <form method="POST" action="{{ url_for('web_profiles.restore_content', id=profile.profile_id, content_id=content.content_id )}}">
+                            {{ form2.csrf_token}}
+                            {{ form2.submit }}
+                        </form>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
 
+        </tbody>
+    </table>
+{% endif %}
 
 {% endblock %}
