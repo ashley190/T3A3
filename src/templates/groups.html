@@ -8,7 +8,7 @@
             <th>Group ID</th>
             <th>Group Name</th>
             <th>Description</th>
-            <th colspan="2">Actions</th>
+            <th colspan="3">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +17,7 @@
             <td>{{ group.groups.group_id}}</td>
             <td>{{ group.groups.name }}</td>
             <td>{{ group.groups.description }}</td>
+            <td><a href="{{ url_for('web_groups.get_group_by_id', id=group.groups.group_id, profile_id=profile.profile_id)}}">View</a></td>
             {% if group.admin %}
                 <td>edit</td>
                 <td>delete</td>
