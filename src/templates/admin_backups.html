@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Admin</h1>
+<h2>Database backups</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Backup Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for backup in backups %}
+        <tr>
+        <td>{{ backup }}</td>
+        <td>
+            <button>
+                <form method="POST" action="{{ url_for('web_admin.restore_backup', name=backup)}}">
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </form>
+            </button>
+        </td>
+        </tr>
+        {% endfor %}
+    </tbody>    
+</table>
+<button>
+    <form method="POST" action="{{ url_for('web_admin.download_database') }}">
+        {{ form2.csrf_token }}
+        {{ form2.submit }}
+    </form>
+</button>
+{% endblock %}

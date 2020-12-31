@@ -8,10 +8,14 @@ from models.Group_members import GroupMembers
 from models.Group import Group
 from models.joined_tables import unrecommend, group_content
 from models.Content import Content
-from forms import DeleteButton, CreateContent
+from forms import DeleteButton, CreateContent, RestoreButton, BackupButton
 from flask_login import login_required, logout_user, login_user, current_user
 from flask import (
     Blueprint, render_template, flash, redirect, url_for, request, abort)
+import os
+import sys
+from datetime import datetime
+
 
 web_admin = Blueprint("web_admin", __name__, url_prefix="/web/admin")
 
@@ -185,3 +189,74 @@ def delete_content(id):
 
     flash(f"Content {content.content_id} deleted!")
     return redirect(url_for("web_admin.view_content"))
+
+
+@web_admin.route("/dbbackups", methods=["GET", "POST"])
+@login_required
+def get_backups():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    backups = sorted(os.listdir("backup"), reverse=True)
+    form = RestoreButton()
+    form2 = BackupButton()
+    return render_template(
+        "admin_backups.html", backups=backups, form=form, form2=form2)
+
+
+@web_admin.route("/dbrestore/<name>", methods=["POST"])
+@login_required
+def restore_backup(name):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    backup_path = f"backup/{name}"
+    tables = [
+        "users", "profiles", "groups", "content",
+        "group_content", "group_members", "unrecommend"]
+
+    for table in tables:
+        cursor = db.session.connection().connection.cursor()
+        cursor.execute(f"TRUNCATE TABLE {table} CASCADE")
+        path = f"{backup_path}/{table}.csv"
+
+        with open(path, "r") as file:
+            cursor.copy_from(file, table, sep=",")
+            db.session.commit()
+
+    flash(f"Database restored to {name}")
+    return redirect(url_for("web_admin.get_backups"))
+
+
+@web_admin.route("/downloaddb", methods=["POST"])
+@login_required
+def download_database():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    cursor = db.session.connection().connection.cursor()
+    cursor.execute(
+        """SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema='public'""")
+    table_names = cursor.fetchall()
+    names = []
+    for name in table_names:
+        names.append(*name)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d;%H%:%M:%S")
+    path = f"backup/{timestamp}"
+
+    for name in names:
+        filename = f"{path}/{name}.csv"
+        if not os.path.exists(os.path.dirname(filename)):
+            try:
+                os.makedirs(os.path.dirname(filename))
+            except OSError:
+                raise "Can't create path"
+
+        with open(filename, "w") as sys.stdout:
+            cursor.copy_to(sys.stdout, f"{name}", sep=",")
+
+    flash("Database backed up")
+    return redirect(url_for("web_admin.get_backups"))

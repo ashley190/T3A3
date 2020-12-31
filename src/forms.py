@@ -89,3 +89,11 @@ class CreateContent(FlaskForm):
     genre = StringField("genre", validators=[DataRequired()])
     year = IntegerField("year")
     submit = SubmitField("Add content")
+
+
+class RestoreButton(FlaskForm):
+    submit = SubmitField("Restore")
+
+
+class BackupButton(FlaskForm):
+    submit = SubmitField("Backup Database")

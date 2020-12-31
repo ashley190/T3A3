@@ -2,7 +2,6 @@
     <a href="{{ url_for('web_admin.view_users') }}">Users</a>
     <a href="{{ url_for('web_admin.view_groups') }}">Groups</a>
     <a href="{{ url_for('web_admin.view_content') }}">Content</a>
-    <a href="#">Backup</a>
-    <a href="#">Download all data</a>
+    <a href="{{ url_for('web_admin.get_backups') }}">Database Backups</a>
     <a href="{{ url_for('web_admin.admin_logout') }}">Logout</a>
 </nav>
