@@ -40,6 +40,7 @@ def web_users_register():
             login_user(new_user)
             return redirect(url_for("web_profiles.show_profiles"))
         flash("Email already registered")
+        return redirect(url_for("web_users.web_users_login"))
     return render_template("user_register.html", form=form)
 
 
@@ -71,6 +72,10 @@ def logout():
 @login_required
 def get_user():
     user = load_user(current_user.get_id())
+
+    if not user:
+        return abort(401, description="Unauthorised to view this page")
+
     subscription_status = "Inactive"
     if user.subscription_status:
         subscription_status = "Active"
@@ -126,3 +131,4 @@ def delete_user():
         logout_user()
         flash("Account deleted")
         return redirect(url_for("web_users.web_users_login"))
+    return redirect(url_for("web_users.get_user"))

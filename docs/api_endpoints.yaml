@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: "1.0.0"
-  title: "T3A3 - Netflix groups"
+  title: "T3A3 - Netflix API"
 tags:
 - name: "users"
   description: "User related functions"

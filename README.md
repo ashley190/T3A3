@@ -3,15 +3,16 @@
 
 ![db-schema](docs/erd.png)
 
-# CI/CD
-Continuous integration
+**Functionality**:
+There are two user interfaces that can be accessed using separate methods and has the following functionality:
 
-The steps involved in the Continuous Integration(CI) workflow upon pushing onto GibHub:-
-1. Checks out project from github into a virtual machine(VM) running on ubuntu-latest.
-2. Installs Python3.8 on the VM
-3. Installs dependencies as specified on requirements.txt
-4. Run Automated tests
-5. Checks code according to PEP8 style guide using flake8
+1. API: Using an API Client such as Insomnia
+
+    Endpoints are constructed according to the RESTful convention and its raw format can be viewed [here](docs/api_endpoints.yaml). This can also be displayed using the [swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/api_endpoints.yaml).2. Web_app: Using a web browser
+
+2. Web application: Using a web browser
+
+    
 
 # File structure
 
@@ -86,8 +87,17 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `pg_dump -Fc -h <host> -U flask netflix -a > <relative_file_path/file_name>`
 
-# Endpoints:
-Endpoints are constructed according to the RESTful convention and its raw format can be viewed [here](docs/endpoints.yaml). This can also be displayed using the [swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/endpoints.yaml).
+
+
+# CI/CD
+Continuous integration
+
+The steps involved in the Continuous Integration(CI) workflow upon pushing onto GibHub:-
+1. Checks out project from github into a virtual machine(VM) running on ubuntu-latest.
+2. Installs Python3.8 on the VM
+3. Installs dependencies as specified on requirements.txt
+4. Run Automated tests
+5. Checks code according to PEP8 style guide using flake8
 
 # Report 1:
 

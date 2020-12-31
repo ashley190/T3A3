@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import (
+    Blueprint, render_template, redirect, url_for, flash, abort)
 from flask_login import current_user, login_required
 from controllers.web_users_controller import load_user
 from models.Profile import Profile
@@ -28,6 +29,9 @@ def show_profiles():
 @login_required
 def create_profile():
     user = load_user(current_user.get_id())
+
+    if not user:
+        return abort(401, description="Unauthorised to view this page")
 
     form = CreateProfile()
     if form.validate_on_submit():

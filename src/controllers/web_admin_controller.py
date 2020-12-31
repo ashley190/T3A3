@@ -191,7 +191,7 @@ def delete_content(id):
     return redirect(url_for("web_admin.view_content"))
 
 
-@web_admin.route("/dbbackups", methods=["GET", "POST"])
+@web_admin.route("/dbbackups", methods=["GET"])
 @login_required
 def get_backups():
     if not load_user(current_user.get_id()):
@@ -210,22 +210,24 @@ def restore_backup(name):
     if not load_user(current_user.get_id()):
         return abort(401, description="Unauthorised to view this page")
 
-    backup_path = f"backup/{name}"
-    tables = [
-        "users", "profiles", "groups", "content",
-        "group_content", "group_members", "unrecommend"]
+    form = RestoreButton()
+    if form.submit.data:
+        backup_path = f"backup/{name}"
+        tables = [
+            "users", "profiles", "groups", "content",
+            "group_content", "group_members", "unrecommend"]
 
-    for table in tables:
-        cursor = db.session.connection().connection.cursor()
-        cursor.execute(f"TRUNCATE TABLE {table} CASCADE")
-        path = f"{backup_path}/{table}.csv"
+        for table in tables:
+            cursor = db.session.connection().connection.cursor()
+            cursor.execute(f"TRUNCATE TABLE {table} CASCADE")
+            path = f"{backup_path}/{table}.csv"
 
-        with open(path, "r") as file:
-            cursor.copy_from(file, table, sep=",")
-            db.session.commit()
+            with open(path, "r") as file:
+                cursor.copy_from(file, table, sep=",")
+                db.session.commit()
 
-    flash(f"Database restored to {name}")
-    return redirect(url_for("web_admin.get_backups"))
+        flash(f"Database restored to {name}")
+        return redirect(url_for("web_admin.get_backups"))
 
 
 @web_admin.route("/downloaddb", methods=["POST"])
@@ -234,29 +236,31 @@ def download_database():
     if not load_user(current_user.get_id()):
         return abort(401, description="Unauthorised to view this page")
 
-    cursor = db.session.connection().connection.cursor()
-    cursor.execute(
-        """SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema='public'""")
-    table_names = cursor.fetchall()
-    names = []
-    for name in table_names:
-        names.append(*name)
+    form = BackupButton()
+    if form.submit.data:
+        cursor = db.session.connection().connection.cursor()
+        cursor.execute(
+            """SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema='public'""")
+        table_names = cursor.fetchall()
+        names = []
+        for name in table_names:
+            names.append(*name)
 
-    timestamp = datetime.now().strftime("%Y-%m-%d;%H%:%M:%S")
-    path = f"backup/{timestamp}"
+        timestamp = datetime.now().strftime("%Y-%m-%d;%H%:%M:%S")
+        path = f"backup/{timestamp}"
 
-    for name in names:
-        filename = f"{path}/{name}.csv"
-        if not os.path.exists(os.path.dirname(filename)):
-            try:
-                os.makedirs(os.path.dirname(filename))
-            except OSError:
-                raise "Can't create path"
+        for name in names:
+            filename = f"{path}/{name}.csv"
+            if not os.path.exists(os.path.dirname(filename)):
+                try:
+                    os.makedirs(os.path.dirname(filename))
+                except OSError:
+                    raise "Can't create path"
 
-        with open(filename, "w") as sys.stdout:
-            cursor.copy_to(sys.stdout, f"{name}", sep=",")
+            with open(filename, "w") as sys.stdout:
+                cursor.copy_to(sys.stdout, f"{name}", sep=",")
 
-    flash("Database backed up")
-    return redirect(url_for("web_admin.get_backups"))
+        flash("Database backed up")
+        return redirect(url_for("web_admin.get_backups"))

@@ -1,21 +1,34 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import (
+    Blueprint, render_template, request, redirect, url_for, flash, abort)
 from flask_login import login_required
 from models.Profile import Profile
 from models.Group import Group
 from models.Group_members import GroupMembers
 from models.Content import Content
 from schemas.GroupSchema import group_schema
-from main import db
+from main import db, login_manager
 from forms import (
     CreateGroup, UpdateGroup, DeleteButton,
     JoinGroup, UnjoinGroup, RemoveButton, AddButton)
+from flask_login import current_user
+from models.User import User
 
 web_groups = Blueprint("web_groups", __name__, url_prefix="/web/groups")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id is not None:
+        return User.query.get(user_id)
+    return None
 
 
 @web_groups.route("/", methods=["GET"])
 @login_required
 def show_groups():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     profile = Profile.query.filter_by(
         profile_id=request.args["profile_id"]).first()
     groups = GroupMembers.query.filter_by(
@@ -35,6 +48,9 @@ def show_groups():
 @web_groups.route("/<int:id>", methods=["GET"])
 @login_required
 def view_group(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     # Check admin status
     profile_id = request.args["profile_id"]
     admin_check = GroupMembers.query.filter_by(
@@ -65,6 +81,9 @@ def view_group(id):
 @web_groups.route("/create", methods=["GET", "POST"])
 @login_required
 def create_group():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     profile = Profile.query.filter_by(
         profile_id=request.args["profile_id"]).first()
 
@@ -87,6 +106,9 @@ def create_group():
 @web_groups.route("/<int:id>/update", methods=["GET", "POST"])
 @login_required
 def update_group(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     profile_id = request.args["profile_id"]
     member = GroupMembers.query.filter_by(
         profile_id=profile_id, group_id=id).first()
@@ -114,6 +136,9 @@ def update_group(id):
 @web_groups.route("<int:id>/delete", methods=["POST"])
 @login_required
 def delete_group(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     profile_id = request.args["profile_id"]
     member = GroupMembers.query.filter_by(
         profile_id=profile_id, group_id=id).first()
@@ -146,6 +171,9 @@ def delete_group(id):
 @web_groups.route("/<int:id>/join", methods=["POST"])
 @login_required
 def join_group(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     form = JoinGroup()
     if form.submit.data:
         profile = Profile.query.filter_by(
@@ -171,6 +199,9 @@ def join_group(id):
 @web_groups.route("/<int:id>/unjoin", methods=["POST"])
 @login_required
 def unjoin_group(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     form = UnjoinGroup()
     if form.submit.data:
         profile = Profile.query.filter_by(
@@ -193,6 +224,9 @@ def unjoin_group(id):
 @web_groups.route("/<int:id>/<int:member_id>/remove", methods=["POST"])
 @login_required
 def remove_member(id, member_id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     form = RemoveButton()
     if form.submit.data:
         member = GroupMembers.query.filter_by(
@@ -215,6 +249,9 @@ def remove_member(id, member_id):
 @web_groups.route("/<int:id>/addcontent", methods=["GET", "POST"])
 @login_required
 def add_content(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     group = Group.query.filter_by(group_id=id).first()
     content = Content.query.all()
     form = AddButton()
@@ -238,6 +275,9 @@ def add_content(id):
 @web_groups.route("/<int:id>/removecontent", methods=["POST"])
 @login_required
 def remove_content(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
     form = RemoveButton()
     if form.submit.data:
         group = Group.query.filter_by(group_id=id).first()

@@ -1,0 +1,795 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "T3A3 - Netflix Web Interface"
+tags:
+- name: "web users"
+  description: "User related functions"
+- name: "web profiles"
+  description: "Profile functions"
+- name: "web groups"
+  description: "Group functions"
+- name: "web admin"
+  description: "Admin related functions"
+paths:
+  /web/register:
+    get:
+      tags:
+      - "web users"
+      summary: "User registration page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+    post:
+      tags:
+      - "web users"
+      summary: "Register new users"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: email
+          type: string
+          description: New user's email
+        - in: formData
+          name: password
+          type: string
+          description: Password
+        - in: formData
+          name: subscribe
+          type: boolean
+          description: Subscription status
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/login:
+    get:
+      tags:
+      - "web users"
+      summary: "User login page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+    post:
+      tags:
+      - "web users"
+      summary: "Login users"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: email
+          type: string
+          description: New user's email
+        - in: formData
+          name: password
+          type: string
+          description: Password
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/account:
+    get:
+      tags:
+      - "web users"
+      summary: "User account info page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/account/update:
+    get:
+      tags:
+      - "web users"
+      summary: "User account update page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web users"
+      summary: "Update user account"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: email
+          type: string
+          description: New user's email
+        - in: formData
+          name: subscribe
+          type: boolean
+          description: Subscription status
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Email already registered"
+  /web/account/delete:
+    post:
+      tags:
+      - "web users"
+      summary: "Delete user account"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/profiles/:
+    get:
+      tags:
+      - "web profiles"
+      summary: "Profiles page"
+      responses:
+        "200":
+          description: "successful operation"
+  /web/profiles/create:
+    get:
+      tags:
+      - "web profiles"
+      summary: "Create profile page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web profiles"
+      summary: "Create profile page"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: name
+          type: string
+          description: New profile name
+        - in: formData
+          name: restrictions
+          type: array
+          items:
+            type: string
+          description: Viewer restrictions
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/profiles/{profile_id}/update:
+    get:
+      tags:
+      - "web profiles"
+      summary: "Update profile page"
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+    post:
+      tags:
+      - "web profiles"
+      summary: "Update profile page"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - in: formData
+          name: name
+          type: string
+          description: New profile name
+        - in: formData
+          name: restrictions
+          type: array
+          items:
+            type: string
+          description: Viewer restrictions
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/profiles/{profile_id}/delete:
+    post:
+      tags:
+      - "web profiles"
+      summary: "Delete profile"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/profiles/{profile_id}/:
+    get:
+      tags:
+      - "web profiles"
+      summary: "View profile page by id"
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/profiles/{profile_id}/{content_id}/unrecommend:
+    post:
+      tags:
+      - "web profiles"
+      summary: "Unrecommend content"
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "content_id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/profiles/{profile_id}/{content_id}/restore:
+    post:
+      tags:
+      - "web profiles"
+      summary: "Restore content"
+      parameters:
+        - name: "profile_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "content_id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/groups/:
+    get:
+      tags:
+      - "web groups"
+      summary: "View groups"
+      parameters:
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}:
+    get:
+      tags:
+      - "web groups"
+      summary: "View group page by id"
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/create:
+    get:
+      tags:
+      - "web groups"
+      summary: "Create group"
+      parameters:
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web groups"
+      summary: "Create group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: name
+          type: string
+          description: New group name
+        - in: formData
+          name: description
+          type: string
+          description: Group description
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/update:
+    get:
+      tags:
+      - "web groups"
+      summary: "Update group"
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web groups"
+      summary: "Update group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: name
+          type: string
+          description: New group name
+        - in: formData
+          name: description
+          type: string
+          description: Group description
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/delete:
+    post:
+      tags:
+      - "web groups"
+      summary: "Delete group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/join:
+    post:
+      tags:
+      - "web groups"
+      summary: "Join group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Join
+          type: string
+          description: Join button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/unjoin:
+    post:
+      tags:
+      - "web groups"
+      summary: "Unjoin group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Unjoin
+          type: string
+          description: Unjoin button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/{member_id}/remove:
+    post:
+      tags:
+      - "web groups"
+      summary: "Remove member"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "member_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Remove
+          type: string
+          description: Remove button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/{group_id}/addcontent:
+    get:
+      tags:
+      - "web groups"
+      summary: "Add content to group"
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web groups"
+      summary: "Add content to group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Add content
+          type: string
+          description: Add content button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/groups/{group_id}/removecontent:
+    post:
+      tags:
+      - "web groups"
+      summary: "Remove content from group"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "group_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - name: "profile_id"
+          in: "query"
+          description: "Profile_id for profile search"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/login:
+    get:
+      tags:
+      - "web admin"
+      summary: "Admin login page"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+    post:
+      tags:
+      - "web admin"
+      summary: "Login admin users"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: username
+          type: string
+          description: New user's email
+        - in: formData
+          name: password
+          type: string
+          description: Password
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+  /web/admin/users:
+    get:
+      tags:
+      - "web admin"
+      summary: "Get users data"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/groups:
+    get:
+      tags:
+      - "web admin"
+      summary: "Get groups data"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/content:
+    get:
+      tags:
+      - "web admin"
+      summary: "Get content data"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/content/add:
+    get:
+      tags:
+      - "web admin"
+      summary: "Add content"
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+    post:
+      tags:
+      - "web admin"
+      summary: "Add content"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: title
+          type: string
+          description: Content title
+        - in: formData
+          name: genre
+          type: string
+          description: Content genre
+        - in: formData
+          name: year
+          type: integer
+          description: Content year
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/content/delete/{content_id}:
+    post:
+      tags:
+      - "web admin"
+      summary: "Remove content"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "content_id"
+          in: "path"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/dbbackups/:
+    get:
+      tags:
+      - "web admin"
+      summary: "View database backups"
+      responses:
+        "200":
+          description: "successful operation"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/dbrestore/{name}:
+    post:
+      tags:
+      - "web admin"
+      summary: "Restore database from selected backup"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: "name"
+          in: "path"
+          required: true
+          type: "integer"
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
+  /web/admin/downloaddb:
+    post:
+      tags:
+      - "web admin"
+      summary: "Backup database"
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: Delete
+          type: string
+          description: Delete button
+      responses:
+        "200":
+          description: "successful operation"
+        "302":
+          description: "Redirect depending on outcome"
+        "401":
+          description: "Unauthorised to view page"
