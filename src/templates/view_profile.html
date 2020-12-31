@@ -52,7 +52,7 @@
                 <td>{{ content.year }}</td>
                 <td>
                     <button>
-                        <form method="POST" action="{{ url_for('web_profiles.restore_content', id=profile.profile_id, content_id=content.content_id )}}">
+                        <form method="POST" action="{{ url_for('web_profiles.restore_content', id=profile.profile_id, content_id=content.content_id) }}">
                             {{ form2.csrf_token}}
                             {{ form2.submit }}
                         </form>

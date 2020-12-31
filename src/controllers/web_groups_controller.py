@@ -3,11 +3,12 @@ from flask_login import login_required
 from models.Profile import Profile
 from models.Group import Group
 from models.Group_members import GroupMembers
+from models.Content import Content
 from schemas.GroupSchema import group_schema
 from main import db
 from forms import (
     CreateGroup, UpdateGroup, DeleteButton,
-    JoinGroup, UnjoinGroup, RemoveButton)
+    JoinGroup, UnjoinGroup, RemoveButton, AddButton)
 
 web_groups = Blueprint("web_groups", __name__, url_prefix="/web/groups")
 
@@ -209,3 +210,46 @@ def remove_member(id, member_id):
         return redirect(url_for(
             "web_groups.view_group", id=id,
             profile_id=request.args["profile_id"]))
+
+
+@web_groups.route("/<int:id>/addcontent", methods=["GET", "POST"])
+@login_required
+def add_content(id):
+    group = Group.query.filter_by(group_id=id).first()
+    content = Content.query.all()
+    form = AddButton()
+    if form.submit.data:
+        group = GroupMembers.query.filter_by(
+            profile_id=request.args["profile_id"], group_id=id).first()
+        content = Content.query.get(request.args["content_id"])
+
+        group.groups.content.append(content)
+        db.session.commit()
+        flash(f"Added content {content.title} to group {id}")
+        return redirect(url_for(
+            "web_groups.view_group", id=id,
+            profile_id=request.args["profile_id"]))
+
+    return render_template(
+        "content.html", group=group, content=content, form=form,
+        id=id, profile_id=request.args["profile_id"])
+
+
+@web_groups.route("/<int:id>/removecontent", methods=["POST"])
+@login_required
+def remove_content(id):
+    form = RemoveButton()
+    if form.submit.data:
+        group = Group.query.filter_by(group_id=id).first()
+        content = Content.query.filter_by(
+            content_id=request.args["content_id"]).first()
+
+        for item in group.content:
+            if item == content:
+                group.content.remove(item)
+                db.session.commit()
+                flash(f"Removed content {item.title} from group {id}")
+
+    return redirect(url_for(
+        "web_groups.view_group", id=id,
+        profile_id=request.args["profile_id"]))

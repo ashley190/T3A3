@@ -70,3 +70,7 @@ class JoinGroup(FlaskForm):
 
 class UnjoinGroup(FlaskForm):
     submit = SubmitField("Unjoin")
+
+
+class AddButton(FlaskForm):
+    submit = SubmitField("Add to group")

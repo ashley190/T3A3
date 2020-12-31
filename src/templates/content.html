@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Content</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Year</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in content %}
+            {% if item not in group.content %}
+                <tr>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.genre }}</td>
+                    <td>{{ item.year }}</td>
+                    <td>
+                        <button>
+                            <form method="POST" action="{{ url_for('web_groups.add_content', id=id, content_id=item.content_id, profile_id=profile_id) }}">
+                                {{ form.csrf_token}}
+                                {{ form.submit }}
+                            </form>
+                        </button>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

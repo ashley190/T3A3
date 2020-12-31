@@ -46,11 +46,19 @@
             <td>{{ content.title }}</td>
             <td>{{ content.genre }}</td>
             <td>{{ content.year }}</td>
+            <td>
+                <button>
+                    <form method="POST" action="{{ url_for('web_groups.remove_content', id=id, content_id=content.content_id, profile_id=profile_id) }}">
+                        {{ form.csrf_token }}
+                        {{ form.submit }}
+                    </form>
+                </button>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="#">Add content</a>
+<a href="{{ url_for('web_groups.add_content', id=id, profile_id=profile_id) }}">Add content</a>
 
 
 {% endblock %}
