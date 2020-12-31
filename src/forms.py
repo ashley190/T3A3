@@ -62,3 +62,11 @@ class CreateGroup(FlaskForm):
 
 class UpdateGroup(CreateGroup):
     submit = SubmitField("Update Group")
+
+
+class JoinGroup(FlaskForm):
+    submit = SubmitField("Join")
+
+
+class UnjoinGroup(FlaskForm):
+    submit = SubmitField("Unjoin")

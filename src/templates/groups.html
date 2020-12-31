@@ -37,7 +37,14 @@
                     </button>
                 </td>
             {% else %}
-                <td colspan="2">unjoin</td>
+                <td colspan="2">
+                    <button>
+                        <form method="POST" action="{{ url_for('web_groups.unjoin_group', id=group.groups.group_id, profile_id=profile.profile_id) }}">
+                            {{ form3.csrf_token }}
+                            {{ form3.submit }}
+                        </form>
+                    </button>
+                </td>
             {% endif %}
         {% endfor %}
         </tr>
@@ -62,7 +69,14 @@
             <td>{{ group.group_id }}</td>
             <td>{{ group.name }}</td>
             <td>{{ group.description }}</td>
-            <td>Join</td>
+            <td>
+                <button>
+                    <form method="POST" action="{{ url_for('web_groups.join_group', id=group.group_id, profile_id=profile.profile_id) }}">
+                        {{ form2.csrf_token }}
+                        {{ form2.submit }}
+                    </form>
+                </button>
+            </td>
         </tr>
     </tbody>
             {% endif %}
