@@ -3,16 +3,30 @@
 {% block content %}
 <h1>Profiles</h1>
 
-{% for profile in profiles %}
-    <a href="{{ url_for('web_profiles.view_profile', id=profile.profile_id)}}">{{ profile.name }}</a>
-    <a href="{{ url_for('web_profiles.update_profile', id=profile.profile_id) }}">update</a>
-    <button>
-        <form method="POST" action="{{ url_for('web_profiles.delete_profile', id=profile.profile_id) }}">
-            {{ form.csrf_token }}
-            {{ form.submit }}
-        </form>
-    </button> 
-{% endfor %}
+<table>
+    <thead>
+        <tr>
+            <th>Profile</th>
+            <th colspan="2">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for profile in profiles %}
+        <tr>
+            <td><a href="{{ url_for('web_profiles.view_profile', id=profile.profile_id)}}">{{ profile.name }}</a></td>
+            <td><a href="{{ url_for('web_profiles.update_profile', id=profile.profile_id) }}">update</a></td>
+            <td>
+            <button>
+                <form method="POST" action="{{ url_for('web_profiles.delete_profile', id=profile.profile_id) }}">
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </form>
+            </button>   
+            </td>      
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <a href="{{ url_for('web_profiles.create_profile') }}">Create New Profile</a>
 
