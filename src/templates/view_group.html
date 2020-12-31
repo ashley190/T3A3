@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ group.name }}</h1>
+<p>{{ group.description }}</p>
+
+<h2>Group Members</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
+<table>
+    {% for member in members %}
+    <tr>
+        <td>{{ member.name }}</td>
+        {% if admin_check.admin and admin_check.profile_id != member.profile_id %}
+        <td>
+            <button>
+                <form method="POST" action="{{ url_for('web_groups.remove_member', id=member.group_id, member_id=member.profile_id, profile_id=profile_id) }}">
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </form>
+            </button>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Content</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Year</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for content in group.content %}
+        <tr>
+            <td>{{ content.title }}</td>
+            <td>{{ content.genre }}</td>
+            <td>{{ content.year }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="#">Add content</a>
+
+
+{% endblock %}

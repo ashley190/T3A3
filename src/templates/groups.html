@@ -25,7 +25,7 @@
             <td>{{ group.groups.group_id}}</td>
             <td>{{ group.groups.name }}</td>
             <td>{{ group.groups.description }}</td>
-            <td><a href="#">View</a></td>
+            <td><a href="{{ url_for('web_groups.view_group', id=group.groups.group_id, profile_id=profile.profile_id) }}">View</a></td>
             {% if group.admin %}
                 <td><a href="{{ url_for('web_groups.update_group', id=group.groups.group_id, profile_id=profile.profile_id)}}">edit</a></td>
                 <td>

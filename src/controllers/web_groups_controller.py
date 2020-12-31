@@ -6,7 +6,8 @@ from models.Group_members import GroupMembers
 from schemas.GroupSchema import group_schema
 from main import db
 from forms import (
-    CreateGroup, UpdateGroup, DeleteButton, JoinGroup, UnjoinGroup)
+    CreateGroup, UpdateGroup, DeleteButton,
+    JoinGroup, UnjoinGroup, RemoveButton)
 
 web_groups = Blueprint("web_groups", __name__, url_prefix="/web/groups")
 
@@ -28,6 +29,36 @@ def show_groups():
         "groups.html", groups=groups, other_groups=other_groups,
         member_group_ids=member_group_ids, profile=profile, form=form,
         form2=form2, form3=form3)
+
+
+@web_groups.route("/<int:id>", methods=["GET"])
+@login_required
+def view_group(id):
+    # Check admin status
+    profile_id = request.args["profile_id"]
+    admin_check = GroupMembers.query.filter_by(
+        profile_id=profile_id, group_id=id).first()
+
+    # Retrieve group members
+    members = GroupMembers.query.with_entities(
+        GroupMembers.group_id, GroupMembers.profile_id,
+        Profile.name).filter_by(group_id=id).outerjoin(Profile)
+    # SELECT group_members.group_id AS group_members_group_id,
+    # profiles.name AS profiles_name
+    # FROM group_members
+    # LEFT OUTER JOIN profiles
+    # ON profiles.profile_id = group_members.profile_id
+    # WHERE group_members.group_id = %(group_id_1)s
+
+    # Retrieve group details
+    group = Group.query.filter_by(group_id=id).first()
+
+    # load remove button
+    form = RemoveButton()
+
+    return render_template(
+        "view_group.html", id=id, admin_check=admin_check, members=members,
+        group=group, form=form, profile_id=profile_id)
 
 
 @web_groups.route("/create", methods=["GET", "POST"])
@@ -156,3 +187,25 @@ def unjoin_group(id):
         flash(f"Unjoined group {id}")
         return redirect(url_for(
             "web_groups.show_groups", profile_id=profile.profile_id))
+
+
+@web_groups.route("/<int:id>/<int:member_id>/remove", methods=["POST"])
+@login_required
+def remove_member(id, member_id):
+    form = RemoveButton()
+    if form.submit.data:
+        member = GroupMembers.query.filter_by(
+            group_id=id, profile_id=member_id).first()
+
+        if not member:
+            flash("Member not found")
+            return redirect(url_for(
+                "web_groups.view_group", id=id,
+                profile_id=request.args["profile_id"]))
+
+        db.session.delete(member)
+        db.session.commit()
+        flash(f"Member {member.profile_id} removed")
+        return redirect(url_for(
+            "web_groups.view_group", id=id,
+            profile_id=request.args["profile_id"]))
