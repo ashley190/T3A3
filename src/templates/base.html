@@ -5,8 +5,10 @@
     </head>
     <body>
         <h1>T3A3 - Netflix extension</h1>
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and '/web/admin' not in request.path %}
             {% include 'navbar.html' %}
+        {% elif current_user.is_authenticated and '/web/admin' in request.path %}
+            {% include 'admin_navbar.html' %}
         {% endif %}
         {% block content %}
         

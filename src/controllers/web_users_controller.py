@@ -55,8 +55,7 @@ def web_users_login():
             login_user(user)
             next_page = request.args.get('next')
             return redirect(next_page or url_for("web_profiles.show_profiles"))
-            return "Login successful"
-        flash("Invalid username and password")
+        flash("Invalid email and password")
         return redirect(url_for("web_users.web_users_login"))
     return render_template("user_login.html", form=form)
 

@@ -21,6 +21,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log In')
 
 
+class AdminLoginForm(FlaskForm):
+    username = StringField(
+        'username', validators=[DataRequired(), Length(min=1)])
+    password = PasswordField('password', validators=[DataRequired()])
+    submit = SubmitField('Log In')
+
+
 class UpdateUserForm(FlaskForm):
     email = StringField('email')
     subscription_status = BooleanField('Subscribe')

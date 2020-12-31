@@ -10,6 +10,7 @@
     </div>
     {% endfor %}
 
+    {% if request.path == '/web/login' %}
     <h3>User Login</h3>
     <form method="POST" action="/web/login">
         {{ form.csrf_token }}
@@ -44,6 +45,39 @@
         <span> Don't have an account?</span>
         <a href="{{ url_for('web_users.web_users_register') }}">Register</a>
     </div>
+    {% endif %}
+
+    {% if request.path == '/web/admin/login' %}
+    <h3>Admin Login</h3>
+    <form method="POST" action="{{ url_for('web_admin.admin_login') }}">
+        {{ form.csrf_token }}
+        <div class="form-field">
+            {{ form.username.label }}
+            {{ form.username }}
+            {% if form.username.errors %}
+            <ul class="errors">
+                {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.password.label }}
+            {{ form.password }}
+            {% if form.password.errors %}
+            <ul class="errors">
+                {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.submit }}
+        </div>
+    </form>
+    {% endif %}
 </div>
 
 {% endblock %}
