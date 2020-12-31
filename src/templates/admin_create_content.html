@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="formwrapper">
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <h3>Create Content</h3>
+    <form method="POST" action="{{ url_for('web_admin.create_content') }}">
+        {{ form.csrf_token }}
+        <div class="form-field">
+            {{ form.title.label }}
+            {{ form.title }}
+            {% if form.title.errors %}
+            <ul class="errors">
+                {% for error in form.title.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.genre.label }}
+            {{ form.genre }}
+            {% if form.genre.errors %}
+            <ul class="errors">
+                {% for error in form.genre.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.year.label }}
+            {{ form.year }}
+            {% if form.year.errors %}
+            <ul class="errors">
+                {% for error in form.year.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            {{ form.submit }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

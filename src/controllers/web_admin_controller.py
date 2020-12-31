@@ -1,4 +1,4 @@
-from main import login_manager
+from main import db, login_manager
 from forms import AdminLoginForm
 from sqlalchemy import func
 from models.Admin import Admin
@@ -6,9 +6,12 @@ from models.User import User
 from models.Profile import Profile
 from models.Group_members import GroupMembers
 from models.Group import Group
+from models.joined_tables import unrecommend, group_content
+from models.Content import Content
+from forms import DeleteButton, CreateContent
 from flask_login import login_required, logout_user, login_user, current_user
 from flask import (
-    Blueprint, render_template, flash, redirect, url_for, request, abort, jsonify)
+    Blueprint, render_template, flash, redirect, url_for, request, abort)
 
 web_admin = Blueprint("web_admin", __name__, url_prefix="/web/admin")
 
@@ -51,7 +54,7 @@ def admin_logout():
 @login_required
 def view_users():
     if not load_user(current_user.get_id()):
-        return abort(401, description="Unauthorised to view users")
+        return abort(401, description="Unauthorised to view this page")
 
     query = User.query.with_entities(
         User.user_id, User.email, func.count(Profile.profile_id).label(
@@ -71,12 +74,114 @@ def view_users():
 @login_required
 def view_groups():
     if not load_user(current_user.get_id()):
-        return abort(401, description="Unauthorised to view users")
+        return abort(401, description="Unauthorised to view this page")
 
-    query = GroupMembers.query.with_entities(GroupMembers.group_id, Group.name, func.count(GroupMembers.profile_id).label("members")).outerjoin(Group).group_by(GroupMembers.group_id, Group.name).order_by(GroupMembers.group_id)
-    # SELECT group_members.group_id AS group_members_group_id, groups.name AS groups_name, count(group_members.profile_id) AS members FROM group_members LEFT OUTER JOIN groups ON groups.group_id = group_members.group_id GROUP BY group_members.group_id, groups.name ORDER BY group_members.group_id
-    # data = []
-    # for item in query:
-    #     data.append(item)
+    query = GroupMembers.query.with_entities(
+        GroupMembers.group_id, Group.name, func.count(
+            GroupMembers.profile_id).label(
+                "members")).outerjoin(Group).group_by(
+                    GroupMembers.group_id, Group.name).order_by(
+                        GroupMembers.group_id)
+    # SELECT group_members.group_id AS group_members_group_id,
+    # groups.name AS groups_name,count(group_members.profile_id) AS members
+    # FROM group_members
+    # LEFT OUTER JOIN groups ON groups.group_id = group_members.group_id
+    # GROUP BY group_members.group_id, groups.name
+    # ORDER BY group_members.group_id
 
     return render_template("admin_groups.html", query=query)
+
+
+@web_admin.route("/content", methods=["GET"])
+@login_required
+def view_content():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    query1 = Content.query.with_entities(
+        Content.content_id, Content.title, func.count(
+            Profile.profile_id).label("unrecommended")).select_from(
+                Content).outerjoin(unrecommend).outerjoin(Profile).group_by(
+                    Content.content_id, Content.title).order_by(
+                        Content.content_id)
+    # SELECT content.content_id AS content_content_id,
+    # content.title AS content_title,
+    # count(profiles.profile_id) AS unrecommended
+    # FROM content
+    # LEFT OUTER JOIN unrecommend
+    # ON content.content_id = unrecommend.content_id
+    # LEFT OUTER JOIN profiles ON profiles.profile_id = unrecommend.profile_id
+    # GROUP BY content.content_id, content.title
+    # ORDER BY content.content_id
+
+    query2 = Content.query.with_entities(Content.content_id, func.count(
+        Group.group_id).label("group_count")).select_from(
+            Content).outerjoin(group_content).outerjoin(Group).group_by(
+                Content.content_id).order_by(Content.content_id)
+    # SELECT content.content_id AS content_content_id,
+    # count(groups.group_id) AS group_count
+    # FROM content
+    # LEFT OUTER JOIN group_content
+    # ON content.content_id = group_content.content_id
+    # LEFT OUTER JOIN groups ON groups.group_id = group_content.group_id
+    # GROUP BY content.content_id ORDER BY content.content_id
+
+    form = DeleteButton()
+    form2 = CreateContent()
+    return render_template(
+        "admin_content.html", query1=query1, query2=query2,
+        form=form, form2=form2)
+
+
+@web_admin.route("/content/add", methods=["GET", "POST"])
+@login_required
+def create_content():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    form = CreateContent()
+    if form.validate_on_submit():
+        new_content = Content(
+            title=form.title.data,
+            genre=form.genre.data,
+            year=form.year.data
+        )
+
+        db.session.add(new_content)
+        db.session.commit()
+        flash(f"Added {new_content.title}")
+        return redirect(url_for("web_admin.view_content"))
+
+    return render_template("admin_create_content.html", form=form)
+
+
+@web_admin.route("/content/delete/<int:id>", methods=["POST"])
+@login_required
+def delete_content(id):
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view this page")
+
+    form = DeleteButton()
+    if form.submit.data:
+        content = Content.query.filter_by(content_id=id).first()
+        groups = Group.query.all()
+
+        for group in groups:
+            for gcontent in group.content:
+                if gcontent.content_id == content.content_id:
+                    group.content.remove(gcontent)
+                    db.session.commit()
+
+        profiles = Profile.query.all()
+
+        for profile in profiles:
+            for unrecommended in profile.unrecommend:
+                if unrecommended.content_id == content.content_id:
+                    profile.unrecommend.remove(unrecommended)
+                    db.session.commit()
+
+        db.session.delete(content)
+        db.session.commit()
+
+    flash(f"Content {content.content_id} deleted!")
+    return redirect(url_for("web_admin.view_content"))

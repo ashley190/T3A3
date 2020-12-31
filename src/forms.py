@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, BooleanField, SubmitField, PasswordField, SelectField)
+    StringField, BooleanField, SubmitField,
+    PasswordField, SelectField, IntegerField)
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -81,3 +82,10 @@ class UnjoinGroup(FlaskForm):
 
 class AddButton(FlaskForm):
     submit = SubmitField("Add to group")
+
+
+class CreateContent(FlaskForm):
+    title = StringField("title", validators=[DataRequired(), Length(min=1)])
+    genre = StringField("genre", validators=[DataRequired()])
+    year = IntegerField("year")
+    submit = SubmitField("Add content")

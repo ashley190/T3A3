@@ -2,6 +2,47 @@
 
 {% block content %}
 <h1>Admin</h1>
-<h2>Groups</h2>
+<h2>Content</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    {{ message }}
+</div>
+{% endfor %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Content ID</th>
+            <th>Title</th>
+            <th>Unrecommended</th>
+            <th>Group content</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in query1 %}
+        <tr>
+            <td>{{ item.content_id }}</td>
+            <td>{{ item.title }}</td>
+            <td align="center">{{ item.unrecommended }}</td>
+            {% for content in query2 %}
+                {% if content.content_id == item.content_id %}
+                    <td align="center">{{ content.group_count }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>
+                <button>
+                    <form method="POST" action="{{ url_for('web_admin.delete_content', id=item.content_id) }}">
+                        {{ form.csrf_token}}
+                        {{ form.submit }}
+                    </form>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('web_admin.create_content') }}">Add content</a>
 
 {% endblock %}
