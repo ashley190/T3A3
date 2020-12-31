@@ -4,9 +4,11 @@ from sqlalchemy import func
 from models.Admin import Admin
 from models.User import User
 from models.Profile import Profile
+from models.Group_members import GroupMembers
+from models.Group import Group
 from flask_login import login_required, logout_user, login_user, current_user
 from flask import (
-    Blueprint, render_template, flash, redirect, url_for, request, abort)
+    Blueprint, render_template, flash, redirect, url_for, request, abort, jsonify)
 
 web_admin = Blueprint("web_admin", __name__, url_prefix="/web/admin")
 
@@ -63,3 +65,18 @@ def view_users():
     # ORDER BY users.user_id
 
     return render_template("admin_users.html", query=query)
+
+
+@web_admin.route("/groups", methods=["GET"])
+@login_required
+def view_groups():
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view users")
+
+    query = GroupMembers.query.with_entities(GroupMembers.group_id, Group.name, func.count(GroupMembers.profile_id).label("members")).outerjoin(Group).group_by(GroupMembers.group_id, Group.name).order_by(GroupMembers.group_id)
+    # SELECT group_members.group_id AS group_members_group_id, groups.name AS groups_name, count(group_members.profile_id) AS members FROM group_members LEFT OUTER JOIN groups ON groups.group_id = group_members.group_id GROUP BY group_members.group_id, groups.name ORDER BY group_members.group_id
+    # data = []
+    # for item in query:
+    #     data.append(item)
+
+    return render_template("admin_groups.html", query=query)

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Admin</h1>
+<h2>Groups</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Group ID</th>
+            <th>Group Name</th>
+            <th>Number of members</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in query %}
+        <tr>
+            <td>{{ item.group_id }}</td>
+            <td>{{ item.name }}</td>
+            <td align="center">{{ item.members }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
