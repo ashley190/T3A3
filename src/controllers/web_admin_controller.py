@@ -1,8 +1,12 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
 from main import login_manager
-from models.Admin import Admin
 from forms import AdminLoginForm
-from flask_login import login_required, logout_user, login_user
+from sqlalchemy import func
+from models.Admin import Admin
+from models.User import User
+from models.Profile import Profile
+from flask_login import login_required, logout_user, login_user, current_user
+from flask import (
+    Blueprint, render_template, flash, redirect, url_for, request, abort)
 
 web_admin = Blueprint("web_admin", __name__, url_prefix="/web/admin")
 
@@ -41,7 +45,21 @@ def admin_logout():
     return redirect(url_for("web_admin.admin_login"))
 
 
-@web_admin.route("/", methods=["GET"])
+@web_admin.route("/users", methods=["GET"])
 @login_required
 def view_users():
-    return render_template("admin_users.html")
+    if not load_user(current_user.get_id()):
+        return abort(401, description="Unauthorised to view users")
+
+    query = User.query.with_entities(
+        User.user_id, User.email, func.count(Profile.profile_id).label(
+            'profile_count')).outerjoin(Profile).group_by(
+                User.user_id).order_by(User.user_id)
+    # SELECT users.user_id AS users_user_id, users.email AS users_email,
+    # count(profiles.profile_id) AS profile_count
+    # FROM users
+    # LEFT OUTER JOIN profiles ON users.user_id = profiles.user_id
+    # GROUP BY users.user_id
+    # ORDER BY users.user_id
+
+    return render_template("admin_users.html", query=query)

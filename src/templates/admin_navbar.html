@@ -1,7 +1,8 @@
 <nav>
-    <a href="#">Users</a>
+    <a href="{{ url_for('web_admin.view_users') }}">Users</a>
     <a href="#">Groups</a>
     <a href="#">Content</a>
     <a href="#">Backup</a>
     <a href="#">Download all data</a>
+    <a href="{{ url_for('web_admin.admin_logout') }}">Logout</a>
 </nav>

@@ -4,4 +4,22 @@
 <h1>Admin</h1>
 <h2>Users</h2>
 
+<table>
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Email</th>
+            <th>Number of profiles</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in query %}
+        <tr>
+            <td>{{ item.user_id }}</td>
+            <td>{{ item.email }}</td>
+            <td align="center">{{ item.profile_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
