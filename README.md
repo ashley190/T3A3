@@ -36,13 +36,20 @@ There are two user interfaces:-
     * [Swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/web_endpoints.yaml)
 
 * **Authentication and authorization**: Web authentication and authorisation is managed through the use of cookies through flask-login to maintain a Stateful session for a logged in user. Users/admin login through the login endpoint and if successful will gain access to user/admin functions.
+
 ![web login](docs/web_login.png)
 
 * **Data display**: Data on the web application is typically displayed in a tabular format with options displayed as tables/links. All links are functional.
+
 ![web data](docs/web_data.png)
 
-* **Create and Update functions**: Data are obtained for create and update functions through the use of forms.
+* **Create and Update functions**: Data is obtained for create and update functions through the use of forms.
+
 ![web form](docs/web_form.png)
+
+* **Alerts**: Alert messages are available to inform users of errors and actions performed.
+
+![alert](docs/alert.png)
 
 # Functionality
 
@@ -165,7 +172,7 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
 8. Set up other variables within the .env folder. These secret keys can be anything you specify but cannot be left blank.
 
-9. Navigate to the src folder in the project and export the required flask environment variables. For example to load flask in the development environment, you can run the following commands in bash to export the required environment variables.
+9. Navigate to the src folder in the project and export the required flask environment variables. For example to load flask in the development environment, you can run the following commands in bash to export the required environment variables. The 'development' environment can be used to access both applications.
 
     `export FLASK_APP=main.py:create_app()`
     `export FLASK_ENV=development`
@@ -222,12 +229,14 @@ The steps involved in the Continuous Integration(CI) workflow upon pushing onto 
 4. Run Automated tests
 5. Checks code according to PEP8 style guide using flake8
 
-# Report 1: Privacy and Security Analysis
+## Reports
+[Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
+
 
 # Report 2: Professional, Ethical and Legal obligations
 
 Passwords hashed
-Input validation at schema and model level
+Input validation at schema and model and client level
 Error handling upon incorrect input
 Password hash not returned during schema serialisation
 Use token authentication (expiry 1 day)
