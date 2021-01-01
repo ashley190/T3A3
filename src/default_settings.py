@@ -23,6 +23,8 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
 
 
 class ProductionConfig(Config):
@@ -33,6 +35,8 @@ class ProductionConfig(Config):
     @property
     def SECRET_KEY(self):
         return get_from_env("SECRET KEY")
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
 
 
 class TestingConfig(Config):

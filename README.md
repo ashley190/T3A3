@@ -1,11 +1,90 @@
 # Introduction
 ## Objective
-The objective of this project is to implement a data access and application layer for the additional features outlined in R7 and R8 of T3A2. Below is the proposed database schema to be implemented.
+The objective of this project is to implement a data access and application layer for the additional features outlined in R7 and R8 of T3A2. Below is a summary on the fulfillment of each requirement code as specified in project brief.
+
+**R1:** In summary of the suggestions in R7 and R8 specified in T3A2, it is to implement an two additional features for the Netflix platform namely:-
+1. A groups feature where users can create, update, join and unjoin group and share watching content through those groups
+2. The unrecommend functionality where individual profile owners can remove content from being recommended to them which will serve to improve on the recommendations algorithms for Netflix through machine learning.
+
+**R2:** [Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
+
+**R3:**[Report 2: Professional, Ethical and Legal Obligations](docs/report-prof_ethical_legal)
+
+**R4, R9:** A data model is implemented on a PostgreSQL database with one-to-one, one-to-many and many-to-many relationships. The application interfaces with the database through the use of Object Relational Mapping (ORM) with SQLAlchemy. SQLAlchemy Marshmallow schemas are used to serialise, deserialise and validate data to and from the database and application for the view component. Below is the database entity diagram that has been implemented in this application.
 
 ![db-schema](docs/erd.png)
 
-## User Interfaces
-There are two user interfaces:-
+Database tables are created through ORM [models](src/models) and serialised through Marshmallow [schemas](src/schemas)
+
+![ORM models](docs/ORM_model.png)
+![schema-validation](docs/schema_validation.png). 
+
+Integrity checks are performed on the controllers to check if users/admin are authorised to access functionalities within the application. Authentication and Authorisation are performed on both the API and web interfaces. 
+
+![Integrity checks](docs/Integrity_checks.png)
+
+**R5, R12:** The implementation of the features described in R1 is achieved through the use of the Flask framework in the MVC (Model-View-Controller) pattern. The file structure within the src folder is in accordance to the MVC pattern and described in further detail in the 'File Structure' section of this document. Evidence of the implementation of CRUD functions and data export can be found in [src/controllers](src/controllers) and further documented in the API and web application endpoint documentation below:
+
+1.  API endpoints
+
+    * [Raw format](docs/api_endpoints.yaml)
+    * [swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/api_endpoints.yaml)
+
+2. Web application endpoints
+
+    * [Raw format](docs/web_endpoints.yaml)
+    * [Swagger viewer](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/web_endpoints.yaml)
+
+    Here is a full list of functionalities implemented in both the API and web interfaces (unless otherwise specified)
+
+    ### Users
+    * User registration
+    * User login
+    * User logout(web only)
+    * View user/account info
+    * Update user/account info
+    * Delete user account
+
+    ### Profiles
+    * Show user profiles
+    * Show individual profiles by id
+    * Create new user profile
+    * Update user profile
+    * Delete user profile
+    * Show available content for each profile(web only)
+    * Show unrecommended content for each profile
+    * Unrecommend content
+    * Remove unrecommended content
+
+    ### Groups
+    * View all groups for all profiles
+    * View group by id for group members and group admin
+    * Create group - users who create group automatically becomes group admin
+    * Update group for group admin only
+    * Delete group for group admin only
+    * Join group for all profiles
+    * Unjoin group for group members
+    * Remove member for group admin only
+    * Add group content for group members
+    * Remove group content for group members
+
+    ### Content
+    * Show all available content(API only)
+
+    ### Admin
+    Admin users are generated through the flask db-custom seed command and cannot be created any other way. Databases must be seeded for the admin function to be available.
+    * Admin login
+    * View user aggregate data
+    * View group aggregate data
+    * View content aggregate data - unrecommended and group content data
+    * Create content
+    * Delete content
+    * Backup database
+    * View available database backups
+    * Restore database from selected backup
+
+
+**R6:** There are two user interfaces implemented.
 
 ### API
 * Access: Using an API Client such as Insomnia
@@ -54,56 +133,19 @@ There are two user interfaces:-
 
 ![alert](docs/alert.png)
 
-# Functionality
+**R7, R10, R11:** API and web endpoints that uses queries that aggregates and parse data can be found in both the [admin_controller](src/controllers/admin_controller.py) and [web_admin_controller](src/controllers/web_admin_controller.py). Both SQL and ORM queries are available with ORM queries being implemented and SQL queries commented out for reference.
 
-Unless otherwise specified, all listed functionalities are available on both the API and web application
+![Code - Aggregating data](docs/data-aggregate-code.png)
 
-## Users
-* User registration
-* User login
-* User logout(web only)
-* View user/account info
-* Update user/account info
-* Delete user account
+**R8** Validation of user input is implemented through the use of Marshmallow schemas (example below). 
+![schema_validation](docs/schema_validation.png)
 
-## Profiles
-* Show user profiles
-* Show individual profiles by id
-* Create new user profile
-* Update user profile
-* Delete user profile
-* Show available content for each profile(web only)
-* Show unrecommended content for each profile
-* Unrecommend content
-* Remove unrecommended content
+Error messages will be displayed to the user on both the APi and web interface through different mechanisms:-
+1. API - Custom error messages returned in the response data.
+![API_error](docs/APIerror.png)
 
-## Groups
-* View all groups for all profiles
-* View group by id for group members and group admin
-* Create group - users who create group automatically becomes group admin
-* Update group for group admin only
-* Delete group for group admin only
-* Join group for all profiles
-* Unjoin group for group members
-* Remove member for group admin only
-* Add group content for group members
-* Remove group content for group members
-
-## Content
-* Show all available content(API only)
-
-## Admin
-Admin users are generated through the flask db-custom seed command and cannot be created any other way. Databases must be seeded for the admin function to be available.
-* Admin login
-* View user aggregate data
-* View group aggregate data
-* View content aggregate data - unrecommended and group content data
-* Create content
-* Delete content
-* Backup database
-* View available database backups
-* Restore database from selected backup
-
+2. Web - Alert messages displayed on the browser
+![Web_error](docs/alert.png)
 
 # File structure
 * [README.md](README.md) - This document
@@ -201,9 +243,22 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `flask db-custom seed`
 
+    User and admin seed login data can be found in [commands.py](src/commands.py).
+
 4. (Optional)To refresh the database, database tables can be dropped before running steps 2 and 3(optional) again or the database can be restored from a previous backup file. To drop the tables:
 
     `flask db-custom drop`
+
+## Running automated tests
+1. Scripts for automated tests are found in the [src/test/](src/tests) folder. The testing environment needs to be exported in order for the tests to run correctly. You'll also need to activate the python virtual environment and navigate into the src folder to run tests.
+
+    `source venv/bin/activate`
+    
+    `cd src`
+
+    `export FLASK_ENV=testing`
+
+    `python -m unittest discover -s tests/ -v`
 
 ## Running the application on an AWS EC2 instance
 1. If running the app on an EC2 instance, the EC2 instance must have be configured to accept incoming TCP connections on port 5000. This can be done through editing the inbound rules on the security group attached to the EC2 instance.
@@ -220,7 +275,11 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `<EC2 public IP address>:5000/users/register`
 
-**Note:** As the T3A3 folder on the EC2 instance will be deleted every time CI/CD is run, may be useful to store the .env file outside of the T3A3 folder and automate a copy of the .env file back into the T3A3/src location each time CI/CD is run.
+**Note:** As the T3A3 folder on the EC2 instance will be deleted every time CI/CD is run, may be useful to store the .env file outside of the T3A3 folder and automate a copy of the .env file back into the T3A3/src location each time CI/CD is run. This has been included in line 45 of the ci-cd.yml file and must be excluded when doing the first deployment.
+
+
+
+
 
 ## Backup and Restore data through the command line
 1. (Optional) If there are any saved postgresql pg_dump files, they can be restored using the following command.
@@ -258,6 +317,8 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `sudo chown ubuntu backup`
 
+5. (BUG) A known bug for AWS EC2 deployment - As the code for the download of database data on the admin endpoints only downloads to a predefined location in the code, the local folder and directories will be generated in a 'backup' directory and stored within the src folder of the project on the EC2 instance. This will interfere with future CI/CD deployments unless manually moved from its original location prior to running the CI/CD workflow and restored to the src folder once CI/CD is completed. This is due to the fact that the 'github-actions' user (CI/CD) will not have the privilege to remove that folder generated by the 'ubuntu' (application) user. Future fixes will include allowing users to specify their preferred location for backups and restore files.
+
 # Continuous integration/Continuous Deployment(CI/CD)
 
 **Continuous Integration(CI)**
@@ -282,7 +343,49 @@ Upon successful completion of the CI process highlighted above, the code will th
 **Note:** Running CI/CD will complete all the steps within 'Project folder and environment setup' in the 'Installation' section on your EC2 instance. 
 To complete setting up the application, complete the steps listed under 'Set up database' and 'Run Migrations' for the app to be fully functional. These steps only need to be done once per instance. See Step 4 in 'Set up database' for options to refresh the database tables.
 
-## Reports
-[Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
+# User Guide
 
-[Report 2: Professional, Ethical and Legal Obligations](docs/report-prof_ethical_legal)
+## API
+Interaction with the API can be achieved through the use of an API client such as [Insomnia Core](https://insomnia.rest/download/). All steps below are demonstrated using Insomnia Core.
+
+1. Using Insomnia Core - Insomnia core is a straightforward API client that can be used to interact with the API. For guidance on how to use Insomnia core, refer to their [official documentation](https://support.insomnia.rest/category/9-getting-started)
+
+2. Refer to the [API endpoint documentation](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ashley190/T3A3/main/docs/api_endpoints.yaml) for requirements for all the API endpoints. In summary, all request body and responses are sent and received in JSON format. Apart from the login and registration endpoints, all other endpoints will require a JWT token (generated at login) included in the header in the following format.
+![Authorisation header](docs/auth_header.png)
+
+## Web Interface
+Interaction with the web interface requires a browser(preferably Google Chrome). Users are allowed to register for an account and login through the specified web endpoints to access the application. Here are some screenshots of the web application.
+
+1. User Registration
+![User Registration](docs/user_registration.png)
+
+2. User Login
+![User Login](docs/user_registration.png)
+
+3. Profiles page with functional links to view, create, update and delete user profiles.
+![Profiles](docs/Profiles.png)
+
+4. Account info page with functional links to update and delete account.
+![Account info](docs/Acc_info.png)
+
+5. View individual profile page with content and unrecommended list as well as functional links to unrecommend and remove unrecommended contents. This page will have an additional navigation link to groups as they are linked to individual profiles.
+![Profilebyid](docs/Profile_by_id.png)
+![unrecommended](docs/unrecommend.png)
+
+6. Group page - View all groups and functional links and buttons to view, join and unjoin groups for non-group administrators and view, edit and delete groups for group administrators. There is also a create group link for group creation. Group creators will be assigned the group admin by default.
+![groups](docs/groups.png)
+
+7. Admin login - login page for admin users
+![admin login](docs/admin_login.png)
+
+8. Admin users view - For admin users to view aggregate user data.
+![admin users](docs/admin_users.png)
+
+9. Admin groups view - For admin users to view aggregate group data.
+![admin groups](docs/admin_groups.png)
+
+10. Contents - For admin users to view, create and delete content.
+![admin content](docs/admin_content.png)
+
+11. Database backups - For admin users to view create and restore from database backup files.
+![admin backup](docs/db_backups.png)
