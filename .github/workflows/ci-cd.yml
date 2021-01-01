@@ -42,5 +42,6 @@ jobs:
           script: |
             rm -rf T3A3
             git clone https://github.com/ashley190/T3A3.git
+            cp .env /home/github-actions/T3A3/src
             python3.8 -m venv /home/github-actions/T3A3/venv
             /home/github-actions/T3A3/venv/bin/pip3.8 install -r /home/github-actions/T3A3/requirements.txt

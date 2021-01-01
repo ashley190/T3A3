@@ -148,7 +148,13 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 ## Set up database
 
 1. Install postgresql on your intended database host
+
+    `sudo apt-get install postgresql`
+
 2. Log into postgresql as postgres user
+
+    `sudo -u postgres psql`
+
 3. Set up 'netflix' database
 
     `CREATE DATABASE netflix;`
@@ -161,11 +167,13 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `GRANT ALL PRIVILEGES ON DATABASE netflix TO flask;`
 
-6. Create password for the user 'flask'
+6. Create password for the user 'flask' and enable user 'flask to login
 
-    `ALTER USER flask WITH ENCRYPTED PASSWORD '<PASSWORD>'`
+    `ALTER USER flask WITH ENCRYPTED PASSWORD '<PASSWORD>';`
 
-7. Create the .env file using the .env.example template and fill in the missing fields in the .env file:- If you've followed steps 3 - 6, the following fields should be:-
+    `ALTER USER flask WITH LOGIN;`
+
+7. Create the .env file within the src folder using the .env.example template and fill in the missing fields in the .env file:- If you've followed steps 3 - 6, the following fields should be:-
 
     * `<user>` = flask
     * `<password>` = password that was set for user flask
@@ -175,13 +183,13 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
 8. Set up other variables within the .env folder. These secret keys can be anything you specify but cannot be left blank.
 
-9. Navigate to the src folder in the project and export the required flask environment variables. For example to load flask in the development environment, you can run the following commands in bash to export the required environment variables. The 'development' environment can be used to access both applications.
+9. Navigate to the src folder in the project and export the required flask environment variables. For example to load flask in the development environment, you can run the following commands in bash to export the required environment variables. The 'development' environment can be used to access both applications (recommended). These variables can also be included in the .env file for ease of future loading.
 
     `export FLASK_APP=main.py:create_app()`
     `export FLASK_ENV=development`
 
 ## Run Migrations
-1. Initialise the use of migrations
+1. Initialise the use of migrations(not usually required)
 
     `flask db init`
 
@@ -192,6 +200,19 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 3. Database tables can be seeded using the following command to populate with dummy data. Database tables MUST be seeded in order for admin functionality to be accessed:
 
     `flask db-custom seed`
+
+## Running the application on an AWS EC2 instance
+1. If running the app on an EC2 instance, the EC2 instance must have be configured to accept incoming TCP connections on port 5000. This can be done through editing the inbound rules on the security group attached to the EC2 instance.
+
+2. Run the flask app on your EC2 instance.
+
+    `python3 -m flask run -h 0.0.0.0`
+
+3. Access the endpoints through the EC2 instance's public IP address. For example:
+
+    `<EC2 public IP address>:5000/users/register`
+
+**Note:** As the T3A3 folder on the EC2 instance will be deleted every time CI/CD is run, may be useful to store the .env file outside of the T3A3 folder and automate a copy of the .env file back into the T3A3/src location each time CI/CD is run.
 
 ## Backup and Restore data through the command line
 1. (Optional) If there are any saved postgresql pg_dump files, they can be restored using the following command.
@@ -223,14 +244,28 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
 * Can't login to admin interface - Run `flask db-custom seed` to ensure admin tables are seeded. Two admin users are created with the usernames 'Admin1' and 'Admin2' with password '654321'.
 
-# Continuous integration
+# Continuous integration/Continuous Deployment(CI/CD)
 
-The steps involved in the Continuous Integration(CI) workflow upon pushing onto GibHub:-
+**Continuous Integration(CI)**
+
+The steps involved in the Continuous Integration(CI) workflow upon pushing onto GitHub:-
 1. Checks out project from github into a virtual machine(VM) running on ubuntu-latest.
 2. Installs Python3.8 on the VM
 3. Installs dependencies as specified on requirements.txt
 4. Run Automated tests
 5. Checks code according to PEP8 style guide using flake8
+
+**Continuous Deployment(CD)**
+
+Upon successful completion of the CI process highlighted above, the code will then be deployed to an AWS EC2 instance set up for the code. GitHub Actions will connect to the EC2 instance via SSH and does a fresh install of the application and its dependencies on the AWS EC2 instance. In order to test this, you will need the following:-
+
+1. Your own EC2 instance running on Ubuntu18.06 or later with python3.8, python3.8-venv and python3-pip installed.
+2. A github-actions user set up on the EC2 instance
+3. Generate an SSH key pair, store the public key under /home/github-actions/.ssh/authorized_keys and copy the private key into the secrets settings within your GitHub repo for T3A3 and name it SSH_KEY.
+4. Obtain the public IP address from your EC2 instance and update the host field with the IP address of your EC2 instance on the [ci-cd.yml](.github/workflows/ci-cd.yml) file.
+5. Run the CI/CD workflow and the application will now be installed and ready to run in a python virtual environment in /home/github-actions/T3A3.
+
+**Note:** Running CI/CD will complete all the steps within 'Project folder and environment setup' in the 'Installation' section on your EC2 instance. To complete setting up the application, complete the steps listed under 'Set up database' and 'Run Migrations' for the app to be fully functional.
 
 ## Reports
 [Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
