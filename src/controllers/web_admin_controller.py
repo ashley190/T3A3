@@ -21,9 +21,9 @@ web_admin = Blueprint("web_admin", __name__, url_prefix="/web/admin")
 
 
 @login_manager.user_loader
-def load_user(admin_id):
-    if admin_id is not None:
-        return Admin.query.get(admin_id)
+def load_user(user_id):
+    if user_id is not None:
+        return User.query.get(user_id)
     return None
 
 
@@ -57,7 +57,8 @@ def admin_logout():
 @web_admin.route("/users", methods=["GET"])
 @login_required
 def view_users():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     query = User.query.with_entities(
@@ -77,7 +78,8 @@ def view_users():
 @web_admin.route("/groups", methods=["GET"])
 @login_required
 def view_groups():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     query = GroupMembers.query.with_entities(
@@ -99,7 +101,8 @@ def view_groups():
 @web_admin.route("/content", methods=["GET"])
 @login_required
 def view_content():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     query1 = Content.query.with_entities(
@@ -140,7 +143,8 @@ def view_content():
 @web_admin.route("/content/add", methods=["GET", "POST"])
 @login_required
 def create_content():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     form = CreateContent()
@@ -162,7 +166,8 @@ def create_content():
 @web_admin.route("/content/delete/<int:id>", methods=["POST"])
 @login_required
 def delete_content(id):
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     form = DeleteButton()
@@ -194,7 +199,8 @@ def delete_content(id):
 @web_admin.route("/dbbackups", methods=["GET"])
 @login_required
 def get_backups():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     backups = sorted(os.listdir("backup"), reverse=True)
@@ -207,7 +213,8 @@ def get_backups():
 @web_admin.route("/dbrestore/<name>", methods=["POST"])
 @login_required
 def restore_backup(name):
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     form = RestoreButton()
@@ -233,7 +240,8 @@ def restore_backup(name):
 @web_admin.route("/downloaddb", methods=["POST"])
 @login_required
 def download_database():
-    if not load_user(current_user.get_id()):
+    admin = Admin.query.get(current_user.get_id())
+    if not admin:
         return abort(401, description="Unauthorised to view this page")
 
     form = BackupButton()

@@ -201,10 +201,18 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
     `flask db-custom seed`
 
+4. (Optional)To refresh the database, database tables can be dropped before running steps 2 and 3(optional) again or the database can be restored from a previous backup file. To drop the tables:
+
+    `flask db-custom drop`
+
 ## Running the application on an AWS EC2 instance
 1. If running the app on an EC2 instance, the EC2 instance must have be configured to accept incoming TCP connections on port 5000. This can be done through editing the inbound rules on the security group attached to the EC2 instance.
 
-2. Run the flask app on your EC2 instance.
+2. Activate the python virtual environment on the T3A3 folder and navigate to the src folder before running the flask app on your EC2 instance.
+
+    (T3A3 folder) `source venv/bin/activate`
+
+    `cd src`
 
     `python3 -m flask run -h 0.0.0.0`
 
@@ -225,7 +233,7 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
 
 # Troubleshooting
 
-* Cannot connect to database remotely(assuming a postgresql database is used)
+1.  Cannot connect to database remotely(assuming a postgresql database is used)
 
     * Try running the following command:
 
@@ -240,9 +248,15 @@ The commands below assumes the use of bash script in a linux OS/mac OS.
         5. Configure your hba_file settings to the following:-
         ![hba settings](docs/hba_settings.png)
 
-* Web pages not loading correctly - try clearing the cache on your browser
+2.  Web pages not loading correctly - try clearing the cache on your browser
 
-* Can't login to admin interface - Run `flask db-custom seed` to ensure admin tables are seeded. Two admin users are created with the usernames 'Admin1' and 'Admin2' with password '654321'.
+3.  Can't login to admin interface - Run `flask db-custom seed` to ensure admin tables are seeded. Two admin users are created with the usernames 'Admin1' and 'Admin2' with password '654321'.
+
+4. Backup function does not work on AWS EC2 flask application - Create the src/backup folder and change the owner of the folder to 'ubuntu'
+
+    (in src folder)`mkdir backup`
+
+    `sudo chown ubuntu backup`
 
 # Continuous integration/Continuous Deployment(CI/CD)
 
@@ -265,7 +279,8 @@ Upon successful completion of the CI process highlighted above, the code will th
 4. Obtain the public IP address from your EC2 instance and update the host field with the IP address of your EC2 instance on the [ci-cd.yml](.github/workflows/ci-cd.yml) file.
 5. Run the CI/CD workflow and the application will now be installed and ready to run in a python virtual environment in /home/github-actions/T3A3.
 
-**Note:** Running CI/CD will complete all the steps within 'Project folder and environment setup' in the 'Installation' section on your EC2 instance. To complete setting up the application, complete the steps listed under 'Set up database' and 'Run Migrations' for the app to be fully functional.
+**Note:** Running CI/CD will complete all the steps within 'Project folder and environment setup' in the 'Installation' section on your EC2 instance. 
+To complete setting up the application, complete the steps listed under 'Set up database' and 'Run Migrations' for the app to be fully functional. These steps only need to be done once per instance. See Step 4 in 'Set up database' for options to refresh the database tables.
 
 ## Reports
 [Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
