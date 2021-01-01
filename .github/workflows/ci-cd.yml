@@ -35,7 +35,7 @@ jobs:
       - name: Fresh clone & repo install
         uses: appleboy/ssh-action@master
         with:
-          host: 34.224.1.234
+          host: 54.210.89.167
           username: github-actions
           key: ${{ secrets.SSH_KEY }}
           port: 22
