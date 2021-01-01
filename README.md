@@ -27,6 +27,9 @@ There are two user interfaces:-
 * **Responses**: Responses will also be received in a JSON format.
 ![Response](docs/json_response.png)
 
+* Data validation and Error messages: Data is validated through the ORM and Marshmallow schemas and error messages are sent back to the user in the response data.
+![Error messages](docs/APIerror.png)
+
 
 ### Web application
 * Access: Using a web browser
@@ -232,15 +235,4 @@ The steps involved in the Continuous Integration(CI) workflow upon pushing onto 
 ## Reports
 [Report 1: Privacy and Security Analysis](docs/report-privacy_security.md)
 
-
-# Report 2: Professional, Ethical and Legal obligations
-
-Passwords hashed
-Input validation at schema and model and client level
-Error handling upon incorrect input
-Password hash not returned during schema serialisation
-Use token authentication (expiry 1 day)
-Token generation process using JWT where secret key is stored and retrieved from environment variables during production(diff from development key)
-User authorisation implemented to perform CRUD actions on user owned profiles only
-Separate logins to admin interface (separate endpoints)
-Require business end to manage admin accounts - account creation, deletion and further segregation of responsibilities within admin accounts if possible considering security factors.
+[Report 2: Professional, Ethical and Legal Obligations](docs/report-prof_ethical_legal)
